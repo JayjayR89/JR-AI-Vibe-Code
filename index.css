@@ -1,4 +1,3 @@
-
 /* CSS Reset */
 * {
     margin: 0;
@@ -451,6 +450,32 @@ body.dark-mode .model-details-button:hover { background-color: var(--button-seco
 body.light-mode .model-details-button { background-color: var(--button-secondary-bg-light); color: var(--button-secondary-text-light); border-color: var(--button-secondary-border-light); }
 body.light-mode .model-details-button:hover { background-color: var(--button-secondary-hover-bg-light); }
 
+.api-key-input-wrapper { display: flex; width: 100%; gap: 5px; margin-bottom: 8px;}
+.api-key-input {
+    flex-grow: 1;
+    padding: 6px 10px;
+    border-radius: 4px;
+    border: 1px solid;
+    font-size: 0.9em;
+}
+body.dark-mode .api-key-input { background-color: var(--input-bg-dark); color: var(--input-text-dark); border-color: var(--input-border-dark); }
+body.light-mode .api-key-input { background-color: var(--input-bg-light); color: var(--input-text-light); border-color: var(--input-border-light); }
+body.dark-mode .api-key-input::placeholder { color: var(--placeholder-text-dark); }
+body.light-mode .api-key-input::placeholder { color: var(--placeholder-text-light); }
+
+.toggle-password-visibility {
+    padding: 6px 10px;
+    font-size: 0.9em;
+    flex-shrink: 0;
+}
+
+.api-key-help {
+    font-size: 0.85em;
+    margin-top: 5px;
+}
+body.dark-mode .api-key-help { color: var(--subtle-text-dark); }
+body.light-mode .api-key-help { color: var(--subtle-text-light); }
+
 .modal-action-button { padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 0.9em; min-width: 80px; border: 1px solid; }
 .modal-action-button.primary {
     background-color: var(--button-primary-bg-dark); color: var(--button-primary-text-dark); border-color: var(--button-primary-border-dark);
@@ -460,8 +485,17 @@ body.light-mode .model-details-button:hover { background-color: var(--button-sec
 }
 body.dark-mode .modal-action-button { background-color: var(--button-secondary-bg-dark); color: var(--button-secondary-text-dark); border-color: var(--button-secondary-border-dark); }
 body.dark-mode .modal-action-button:hover { background-color: var(--button-secondary-hover-bg-dark); }
-body.dark-mode #saveModelsButton { background-color: var(--button-primary-bg-dark); color: var(--button-primary-text-dark); border-color: var(--button-primary-border-dark); }
-body.dark-mode #saveModelsButton:hover { background-color: var(--button-primary-hover-bg-dark); }
+body.dark-mode #saveModelsButton, body.dark-mode #saveGeminiApiKey { background-color: var(--button-primary-bg-dark); color: var(--button-primary-text-dark); border-color: var(--button-primary-border-dark); }
+body.dark-mode #saveModelsButton:hover, body.dark-mode #saveGeminiApiKey:hover { background-color: var(--button-primary-hover-bg-dark); }
+body.light-mode .modal-action-button.primary {
+    background-color: var(--button-primary-bg-light); color: var(--button-primary-text-light); border-color: var(--button-primary-border-light);
+}
+body.light-mode .modal-action-button.primary:hover {
+    background-color: var(--button-primary-hover-bg-light);
+}
+body.light-mode #saveModelsButton, body.light-mode #saveGeminiApiKey { background-color: var(--button-primary-bg-light); color: var(--button-primary-text-light); border-color: var(--button-primary-border-light); }
+body.light-mode #saveModelsButton:hover, body.light-mode #saveGeminiApiKey:hover { background-color: var(--button-primary-hover-bg-light); }
+
 
 .modal-footer { padding: 15px 20px; text-align: right; border-top: 1px solid; }
 body.dark-mode .modal-footer { border-color: var(--divider-color-dark); }
@@ -614,6 +648,7 @@ body.dark-mode #selectElementsToggle.active { background-color: var(--accent-col
 body.light-mode #selectElementsToggle.active { background-color: var(--accent-color-light); color: var(--button-primary-text-light); }
 
 .hidden { display: none !important; }
+
 
 @media (max-width: 768px) {
     header, .secondary-header { flex-direction: column; align-items: stretch; gap: 8px; padding: 10px; }
