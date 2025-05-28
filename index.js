@@ -1,4 +1,3 @@
-
 import { GoogleGenAI } from "@google/genai";
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -13,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const authContainer = getElem('authContainer');
     const modelSelect = getElem('modelSelect');
     const puterModelLabel = querySel('.puter-model-label');
+    const puterModelSettingsElements = document.querySelectorAll('.puter-model-settings');
     const geminiModelLabelElement = getElem('geminiModelLabel');
     const settingsButton = getElem('settingsButton');
     const settingsModal = getElem('settingsModal');
@@ -21,6 +21,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const darkModeToggle = getElem('darkModeToggle');
     const tooltipsToggle = getElem('tooltipsToggle');
     const geminiApiToggle = getElem('geminiApiToggle');
+    const geminiApiKeyContainer = getElem('geminiApiKeyContainer');
+    const geminiApiKeyInput = getElem('geminiApiKeyInput');
+    const toggleApiKeyVisibilityButton = getElem('toggleApiKeyVisibility');
+    const saveGeminiApiKeyButton = getElem('saveGeminiApiKey');
+    const geminiApiKeyStatus = getElem('geminiApiKeyStatus');
     const modelListContainer = getElem('modelListContainer');
     const saveModelsButton = getElem('saveModelsButton');
     const tabButtons = document.querySelectorAll('.tab-button');
@@ -101,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const modelDetailsContent = getElem('modelDetailsContent');
     const closeModelDetailsFooterButton = getElem('closeModelDetailsFooterButton');
 
-    const APP_VERSION = '1.0.7'; 
+    const APP_VERSION = '1.0.8'; 
     if(appVersionSpan) appVersionSpan.textContent = APP_VERSION;
 
     // --- State & Constants ---
@@ -177,18 +182,37 @@ Happy Vibe Coding!
         catch (e) { console.warn(`Failed to save ${key} to localStorage:`, e); }
     }
 
-    // --- Gemini API Initialization ---
-    function initializeGeminiClient() { 
+    function initializeGeminiClient() {
+        const obfuscatedKey = localStorage.getItem('geminiApiKey');
+        if (geminiApiKeyStatus) geminiApiKeyStatus.textContent = ""; 
+
+        if (!obfuscatedKey) {
+            if (geminiApiKeyStatus) geminiApiKeyStatus.textContent = "Gemini API key not set.";
+            googleAi = null;
+            return false;
+        }
         try {
-            if (!process.env.API_KEY) {
-                alert("Gemini API key (process.env.API_KEY) is not set. Gemini API will be disabled.");
-                return false;
+            const apiKey = atob(obfuscatedKey);
+            if (!apiKey) {
+                 if (geminiApiKeyStatus) geminiApiKeyStatus.textContent = "Saved API key is empty after decoding.";
+                 googleAi = null;
+                 return false;
             }
-            googleAi = new GoogleGenAI({ apiKey: process.env.API_KEY });
+            googleAi = new GoogleGenAI({ apiKey });
+            // Quick test to see if the client is functional (optional, might consume quota)
+            // googleAi.models.generateContent({ model: GEMINI_TEXT_MODEL, contents: "test" }).then(() => {
+            //     if (geminiApiKeyStatus) geminiApiKeyStatus.textContent = "Gemini API key is valid.";
+            // }).catch(err => {
+            //     if (geminiApiKeyStatus) geminiApiKeyStatus.textContent = "Gemini API key is invalid or client error.";
+            //     console.error("Gemini client test failed:", err);
+            //     googleAi = null; // Invalidate if test fails
+            // });
+            if (geminiApiKeyStatus) geminiApiKeyStatus.textContent = "Gemini API key loaded. Client initialized.";
             return true;
         } catch (error) {
-            console.error("Failed to initialize Gemini AI Client:", error);
-            alert("Failed to initialize Gemini AI. Please check your API key and network. Gemini API will be disabled.");
+            console.error('Error initializing Gemini client or decoding API key:', error);
+            if (geminiApiKeyStatus) geminiApiKeyStatus.textContent = "Failed to initialize Gemini: Invalid key or decoding error.";
+            googleAi = null;
             return false;
         }
     }
@@ -204,6 +228,13 @@ Happy Vibe Coding!
                 geminiModelLabelElement.textContent = `Model: ${GEMINI_TEXT_MODEL}`;
             }
         }
+        if (geminiApiKeyContainer) {
+            geminiApiKeyContainer.style.display = useGeminiAPI ? 'flex' : 'none';
+        }
+        puterModelSettingsElements.forEach(el => {
+            el.style.display = useGeminiAPI ? 'none' : ''; // Empty string reverts to stylesheet's display
+        });
+
         saveToLocalStorage('useGeminiAPI', useGeminiAPI);
     }
 
@@ -366,7 +397,10 @@ Happy Vibe Coding!
             'fullscreenButton': 'View the live preview in fullscreen mode.',
             'darkModeToggle': 'Switch between dark and light UI themes.',
             'tooltipsToggle': 'Enable or disable these descriptive tooltips.',
-            'geminiApiToggle': 'Switch to use Google Gemini API (requires API key). Overrides Puter models.',
+            'geminiApiToggle': 'Switch to use Google Gemini API (requires user-provided API key). Overrides Puter models.',
+            'geminiApiKeyInput': 'Enter your Google Gemini API Key here.',
+            'toggleApiKeyVisibility': 'Show or hide the entered API key.',
+            'saveGeminiApiKey': 'Save the entered Gemini API key to your browser\'s local storage.',
             'saveModelsButton': 'Save your preferred Puter.com models for the dropdown menu.',
             'addKnowledgeDocButton': 'Add a new text document to the AI\'s knowledge base for better context.',
             'appMemoryToggle': '(Future Feature) Enable persistent chat history for AI context.',
@@ -610,7 +644,10 @@ Happy Vibe Coding!
         const knowledgePreamble = activeKnowledge ? `Consider the following information as relevant context (Knowledge Base):\n${activeKnowledge}\n\n---\n\n` : "";
 
         if (useGeminiAPI) {
-            if (!googleAi) { alert("Gemini AI client not initialized."); button.textContent = originalButtonText; button.disabled = false; return; }
+            if (!googleAi) { 
+                alert("Gemini AI client not initialized. Please check your API key in settings."); 
+                button.textContent = originalButtonText; button.disabled = false; return; 
+            }
             let geminiContents;
             const currentCodeForModification = isActiveFileEmpty ? "" : activeFile.content;
             if (isModification) { 
@@ -618,7 +655,10 @@ Happy Vibe Coding!
             } else { 
                 geminiContents = `${knowledgePreamble}You are an expert web developer. Generate complete, runnable code for a file named "${activeFile.name}" based on the user's request. The output should ONLY be the raw code for this file.\n\nUser's request: ${prompt}`; 
             }
-            try { const response = await googleAi.models.generateContent({ model: GEMINI_TEXT_MODEL, contents: geminiContents }); generatedCodeText = response.text; } 
+            try { 
+                const response = await googleAi.models.generateContent({ model: GEMINI_TEXT_MODEL, contents: geminiContents }); 
+                generatedCodeText = response.text; 
+            } 
             catch (error) { console.error("Gemini API Error:", error); alert(`Gemini API Error: ${error.message}`); button.textContent = originalButtonText; button.disabled = false; return; }
         } else { 
             const messages = [{ role: 'system', content: `${knowledgePreamble}${puterSystemPrompt}` }];
@@ -655,7 +695,7 @@ Happy Vibe Coding!
         while (el.nodeType === Node.ELEMENT_NODE) {
             let selector = el.nodeName.toLowerCase();
             if (el.id) {
-                selector += `#${el.id}`;
+                selector += `#${el.id.trim().replace(/\s+/g, '-')}`; // Sanitize ID
                 path.unshift(selector);
                 break; 
             } else {
@@ -845,10 +885,19 @@ Happy Vibe Coding!
         const systemPrompt = `${knowledgePreamble}You are an expert web developer. You will be given an HTML element's code and a user's request to modify it. Return ONLY the modified HTML code for that element. Keep existing attributes if not specified to change.`;
 
         if (useGeminiAPI) { 
-            if (!googleAi) { /* ... */ return false;}
+            if (!googleAi) { 
+                 alert("Gemini AI client not initialized. Please check your API key in settings.");
+                 sourceButton.textContent = originalButtonText; sourceButton.disabled = false;
+                 return false;
+            }
             const contents = `${systemPrompt}\n\nOriginal Element:\n\`\`\`html\n${elementOuterHTML}\n\`\`\`\n\nUser's request: ${aiPrompt}`;
             try { const response = await googleAi.models.generateContent({ model: GEMINI_TEXT_MODEL, contents }); modifiedElementSnippet = response.text; }
-            catch (e) { /* ... */ return false; }
+            catch (e) { 
+                 console.error("Gemini API element edit error:", e);
+                 alert(`Gemini API Error: ${e.message}`);
+                 sourceButton.textContent = originalButtonText; sourceButton.disabled = false;
+                 return false;
+            }
         } else { 
             const messages = [{ role: 'system', content: systemPrompt }, { role: 'user', content: `Original Element:\n\`\`\`html\n${elementOuterHTML}\n\`\`\`\n\nRequest: ${aiPrompt}` }];
             try { const response = await puter.ai.chat(messages, { model: modelSelect.value }); modifiedElementSnippet = response.message.content; } 
@@ -1036,7 +1085,56 @@ Happy Vibe Coding!
 
     if (darkModeToggle) darkModeToggle.addEventListener('change', () => applyTheme(darkModeToggle.checked ? 'dark' : 'light'));
     if (tooltipsToggle) tooltipsToggle.addEventListener('change', () => { applyTooltipsSetting(tooltipsToggle.checked); saveToLocalStorage('tooltipsEnabled', tooltipsToggle.checked); });
-    if (geminiApiToggle) geminiApiToggle.addEventListener('change', () => { useGeminiAPI = geminiApiToggle.checked; if (useGeminiAPI && !googleAi) { if(!initializeGeminiClient()) { useGeminiAPI = false; geminiApiToggle.checked = false; } } updateApiUsageUI(); });
+    
+    if (geminiApiToggle) {
+        geminiApiToggle.addEventListener('change', () => {
+            useGeminiAPI = geminiApiToggle.checked;
+            if (useGeminiAPI) {
+                if (!initializeGeminiClient()) { // Try to init with saved key
+                    // If init fails (e.g. no key saved yet), keep Gemini enabled but client is null
+                    if(geminiApiKeyStatus) geminiApiKeyStatus.textContent = "Gemini API enabled. Please enter and save your API key.";
+                }
+            } else {
+                googleAi = null; // Clear client if disabling
+                if(geminiApiKeyStatus) geminiApiKeyStatus.textContent = "Gemini API disabled.";
+            }
+            updateApiUsageUI();
+        });
+    }
+
+    if (saveGeminiApiKeyButton) {
+        saveGeminiApiKeyButton.addEventListener('click', () => {
+            const apiKey = geminiApiKeyInput.value.trim();
+            if (!apiKey) {
+                alert("Please enter a Gemini API key.");
+                if(geminiApiKeyStatus) geminiApiKeyStatus.textContent = "API key cannot be empty.";
+                return;
+            }
+            try {
+                localStorage.setItem('geminiApiKey', btoa(apiKey)); // Obfuscate
+                if (initializeGeminiClient()) {
+                    alert('Gemini API key saved and client initialized successfully!');
+                    if(geminiApiKeyStatus) geminiApiKeyStatus.textContent = "API key saved and valid.";
+                } else {
+                    alert('Gemini API key saved, but client initialization failed. Key might be invalid.');
+                     if(geminiApiKeyStatus) geminiApiKeyStatus.textContent = "API key saved, but seems invalid.";
+                }
+                geminiApiKeyInput.value = ''; // Clear after saving
+            } catch (e) {
+                console.error("Error saving or encoding API key:", e);
+                alert("Failed to save API key.");
+                if(geminiApiKeyStatus) geminiApiKeyStatus.textContent = "Error saving API key.";
+            }
+        });
+    }
+    if (toggleApiKeyVisibilityButton) {
+        toggleApiKeyVisibilityButton.addEventListener('click', () => {
+            const isPassword = geminiApiKeyInput.type === 'password';
+            geminiApiKeyInput.type = isPassword ? 'text' : 'password';
+            toggleApiKeyVisibilityButton.textContent = isPassword ? '🙈' : '👁️';
+        });
+    }
+    
     if (saveModelsButton) saveModelsButton.addEventListener('click', () => {  const selected = [...modelListContainer.querySelectorAll('input:checked')].map(cb => cb.value); if (selected.length === 0) return alert("Please select at least one model."); saveDropdownModels(selected); populateModelDropdown(); alert('Puter model selection saved!'); });
     if (modelSelect) modelSelect.addEventListener('change', () => { saveToLocalStorage('lastSelectedModel', modelSelect.value); });
     if (appProjectNameInput) appProjectNameInput.addEventListener('input', () => saveToLocalStorage('appProjectName', appProjectNameInput.value));
@@ -1126,7 +1224,7 @@ Happy Vibe Coding!
     });
 
     projectTypeButtons.forEach(button => button.addEventListener('click', handleProjectTypeSelection));
-    if (dontShowWelcomeAgainCheckbox) { // Add listener for the checkbox
+    if (dontShowWelcomeAgainCheckbox) { 
         dontShowWelcomeAgainCheckbox.addEventListener('change', () => {
             saveToLocalStorage('dontShowWelcomeAgain', dontShowWelcomeAgainCheckbox.checked);
         });
@@ -1156,9 +1254,11 @@ Happy Vibe Coding!
         }
         
         useGeminiAPI = loadFromLocalStorage('useGeminiAPI', false);
-        if (useGeminiAPI && !googleAi) { if(!initializeGeminiClient()) useGeminiAPI = false; }
-        if (geminiApiToggle) geminiApiToggle.checked = useGeminiAPI; 
-        updateApiUsageUI();
+        if (geminiApiToggle) geminiApiToggle.checked = useGeminiAPI;
+        if (useGeminiAPI) {
+            initializeGeminiClient(); // Attempt to initialize with saved key if Gemini API was enabled
+        }
+        updateApiUsageUI(); // This will also handle showing/hiding API key input
         
         populateModelList(); populateModelDropdown(); 
         setupSpeechRecognition(); 
