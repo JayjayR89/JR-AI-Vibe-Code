@@ -6,6 +6,7 @@
     <title>Vibe Code Canvas – AI UI Builder</title>
     <link rel="stylesheet" href="index.css">
     <script src="https://js.puter.com/v2/"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script type="importmap">
 {
   "imports": {
@@ -47,8 +48,8 @@
             <div class="dropdown">
                 <button id="downloadButton" class="header-button dropdown-toggle" aria-label="Download">📄 Download</button>
                 <div class="dropdown-content">
-                    <a href="#" id="downloadHtml">Download HTML</a>
-                    <a href="#" id="downloadZip">Download as ZIP</a>
+                    <a href="#" id="downloadHtml">Download Active HTML</a>
+                    <a href="#" id="downloadZip">Download Project as ZIP</a>
                 </div>
             </div>
         </div>
@@ -64,11 +65,11 @@
                 <div id="aiToolsSection1" class="ai-tool-section">
                     <h4 id="aiToolsSection1Title">1. Describe your UI</h4>
                     <div id="aiToolsSection1Content">
-                        <div class="input-area">
-                            <textarea id="generatePromptInput" rows="4" placeholder="e.g., a landing page hero section..."></textarea>
+                        <textarea id="generatePromptInput" rows="4" placeholder="e.g., a landing page hero section..."></textarea>
+                        <div class="action-button-row">
                             <button id="generateMicrophoneButton" class="microphone-button" aria-label="Use Microphone for Generate Prompt">🎤</button>
+                            <button id="generateCodeButton">Generate Code ➔</button>
                         </div>
-                        <button id="generateCodeButton">Generate Code ➔</button>
                         <p class="tip-text">Tip: Enter to submit, Shift+Enter for new line.</p>
                     </div>
                     <div id="generatedPromptDisplay" class="minimized-prompt-display hidden">
@@ -80,11 +81,11 @@
 
                 <div id="aiToolsSection2" class="ai-tool-section hidden">
                     <h4>2. Modify app</h4>
-                    <div class="input-area">
-                        <textarea id="modifyPromptInput" rows="3" placeholder="e.g., Change the background color to lightblue..."></textarea>
+                    <textarea id="modifyPromptInput" rows="3" placeholder="e.g., Change the background color to lightblue..."></textarea>
+                    <div class="action-button-row">
                         <button id="modifyMicrophoneButton" class="microphone-button" aria-label="Use Microphone for Modify Prompt">🎤</button>
+                        <button id="modifyCodeButton">Modify Code ➔</button>
                     </div>
-                    <button id="modifyCodeButton">Modify Code ➔</button>
                 </div>
 
                 <div id="aiToolsSection3" class="ai-tool-section hidden">
@@ -150,14 +151,24 @@
         <div id="codeFilesPanel" class="panel">
             <div class="panel-header">
                 <h3>Generated Code</h3>
-                <button id="filesButton" class="panel-header-button" aria-label="Files">📄 Files</button>
+                <button id="filesButton" class="panel-header-button" aria-label="Manage Files">📄 Files</button>
             </div>
-            <pre id="codeOutput"><code>No code generated yet. Enter a prompt to start.</code></pre>
+            <div id="filesToolbar" class="files-toolbar hidden">
+                <div id="fileTabsContainer" class="file-tabs-container">
+                   <!-- File tabs will be dynamically inserted here -->
+                </div>
+                <div class="file-actions">
+                    <button id="newFileButton" class="header-button" aria-label="New File">➕ New</button>
+                    <button id="uploadFileButton" class="header-button" aria-label="Upload File">⬆️ File</button>
+                    <button id="uploadFolderButton" class="header-button" aria-label="Upload Folder">📁 Folder</button>
+                </div>
+            </div>
+            <pre id="codeOutputWrapper"><code id="codeOutput" contenteditable="true" spellcheck="false">No code generated yet. Enter a prompt to start.</code></pre>
         </div>
         <div id="previewAppPanel" class="panel">
             <div class="panel-header">
                 <h3>Live Preview</h3>
-                <div>
+                <div class="preview-controls">
                     <button id="selectElementsToggle" class="panel-header-button">Select Elements: OFF</button>
                     <button id="popOutButton" class="panel-header-button" aria-label="Pop-out Preview">↗️ Pop-out</button>
                     <button id="fullscreenButton" class="panel-header-button" aria-label="Fullscreen Preview">↔️ Fullscreen</button>
@@ -176,6 +187,7 @@
             <div class="tabs">
                 <button class="tab-button active" data-tab="uiSettingsTab">UI</button>
                 <button class="tab-button" data-tab="modelSettingsTab">Models</button>
+                <button class="tab-button" data-tab="knowledgeSettingsTab">Knowledge</button>
                 <button class="tab-button" data-tab="generalSettingsTab">General</button>
                 <button class="tab-button" data-tab="aboutSettingsTab">About</button>
             </div>
@@ -208,21 +220,32 @@
                     </label>
                 </div>
                 <p style="margin-top: 15px;">Select Puter.com models (active if Gemini API is disabled):</p>
-                <div id="modelListContainer" role="listbox" aria-multiselectable="true"></div>
+                <div id="modelListContainer" role="listbox" aria-multiselectable="true">
+                    <!-- Models populated by JS -->
+                </div>
                 <button id="saveModelsButton" class="modal-action-button">Save Puter Model Selection</button>
+            </div>
+            
+            <div id="knowledgeSettingsTab" class="tab-content">
+                <h3>Knowledge Base</h3>
+                <button id="addKnowledgeDocButton" class="modal-action-button" style="margin-bottom: 15px;">+ Add Document</button>
+                <div id="knowledgeListContainer">
+                    <!-- Knowledge documents listed here -->
+                    <p id="noKnowledgeDocsMessage">No knowledge documents added yet.</p>
+                </div>
             </div>
 
             <div id="generalSettingsTab" class="tab-content">
                 <h3>General Settings</h3>
                 <div class="setting-item">
-                    <label for="appMemoryToggle">Enable App Memory (Chat History)</label>
+                    <label for="appMemoryToggle">Enable App Memory (Future: Retain chat history for context)</label>
                     <label class="switch">
                         <input type="checkbox" id="appMemoryToggle" checked>
                         <span class="slider round"></span>
                     </label>
                 </div>
                 <div class="setting-item">
-                    <label for="fileContextToggle">Enable File Context (Experimental)</label>
+                    <label for="fileContextToggle">Enable File Context (Future: Allow AI to see all project files)</label>
                     <label class="switch">
                         <input type="checkbox" id="fileContextToggle">
                         <span class="slider round"></span>
@@ -233,17 +256,18 @@
             <div id="aboutSettingsTab" class="tab-content">
                 <h3>About Vibe Code Canvas</h3>
                 <p>
-                    Created by <a href="https://jayreddin.github.io" target="_blank" rel="noopener noreferrer">Jamie Reddin</a> using the <a href="https://puter.com" target="_blank" rel="noopener noreferrer">Puter.com</a> <a href="https://docs.puter.com" target="_blank" rel="noopener noreferrer">API</a> and Google Gemini API. || Version <span id="appVersion">1.0.5</span>
+                    Created by <a href="https://jayreddin.github.io" target="_blank" rel="noopener noreferrer">Jamie Reddin</a> using the <a href="https://puter.com" target="_blank" rel="noopener noreferrer">Puter.com</a> <a href="https://docs.puter.com" target="_blank" rel="noopener noreferrer">API</a> and Google Gemini API. || Version <span id="appVersion">1.0.7</span>
                 </p>
                 <h4>Features:</h4>
                 <ul>
-                    <li>AI-powered UI generation & modification</li>
+                    <li>AI-powered UI generation & modification (HTML, CSS, JS in one file)</li>
+                    <li>Multi-file support (HTML, CSS, JS, MD etc.) with tabbed editor</li>
                     <li>Real-time element editing (in-app & pop-out)</li>
                     <li>Live application preview & Pop-out</li>
                     <li>Customizable interface and model selection (Puter/Gemini)</li>
                     <li>Secure authentication via Puter</li>
-                    <li>Code Checkpoints (Manual & Automatic, with Restore)</li>
-                    <li>Tooltips</li>
+                    <li>Code Checkpoints (Manual & Automatic, with Restore for all project files)</li>
+                    <li>Tooltips, Knowledge Base Integration</li>
                 </ul>
             </div>
             <div class="modal-footer">
@@ -259,7 +283,6 @@
                 <button id="closeRestoreCheckpointsModal" class="close-button" aria-label="Close Restore Checkpoints Modal">&times;</button>
             </div>
             <div id="checkpointsListContainer" class="tab-content active" style="padding: 20px;">
-                <!-- Checkpoints will be listed here by JS -->
                 <p id="noCheckpointsMessage">No checkpoints available to restore.</p>
             </div>
             <div class="modal-footer">
@@ -267,9 +290,69 @@
             </div>
         </div>
     </div>
+
+    <div id="welcomeModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="welcomeModalTitle">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2 id="welcomeModalTitle">Welcome to Vibe Code Canvas!</h2>
+            </div>
+            <div class="modal-body" style="padding: 20px;">
+                <p>Choose a starting point for your project:</p>
+                <ul class="project-type-list">
+                    <li><button class="project-type-button" data-project-type="blank">🚀 Blank Project</button></li>
+                    <li><button class="project-type-button" data-project-type="simple-web">📄 Simple Web Page (HTML)</button></li>
+                    <li><button class="project-type-button" data-project-type="nodejs-app" disabled>⚙️ Basic Node.js App (Soon)</button></li>
+                </ul>
+                 <div style="margin-top:20px; text-align: right;">
+                    <input type="checkbox" id="dontShowWelcomeAgain" style="margin-right: 5px;">
+                    <label for="dontShowWelcomeAgain" style="font-size:0.9em;">Don't show this again</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="addKnowledgeDocModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="addKnowledgeDocModalTitle">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="addKnowledgeDocModalTitle">Add Knowledge Document</h2>
+                <button id="closeAddKnowledgeDocModal" class="close-button" aria-label="Close Add Document Modal">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 20px; display: flex; flex-direction: column; gap: 15px;">
+                <div>
+                    <label for="knowledgeDocTitleInput">Document Title:</label>
+                    <input type="text" id="knowledgeDocTitleInput" class="standard-input" placeholder="e.g., My API Documentation">
+                </div>
+                <div>
+                    <label for="knowledgeDocContentInput">Document Content:</label>
+                    <textarea id="knowledgeDocContentInput" rows="10" class="standard-textarea" placeholder="Paste or write your document content here..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="saveKnowledgeDocButton" class="modal-action-button primary">Save Document</button>
+                <button id="cancelAddKnowledgeDocButton" class="modal-action-button">Cancel</button>
+            </div>
+        </div>
+    </div>
     
+    <div id="modelDetailsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modelDetailsModalTitle">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2 id="modelDetailsModalTitle">Model Details</h2>
+                <button id="closeModelDetailsModal" class="close-button">&times;</button>
+            </div>
+            <div id="modelDetailsContent" class="modal-body" style="padding: 20px;">
+                <p>Details will appear here.</p>
+            </div>
+            <div class="modal-footer">
+                <button id="closeModelDetailsFooterButton" class="modal-action-button">Close</button>
+            </div>
+        </div>
+    </div>
+    
+    <input type="file" id="fileUploader" class="hidden" multiple>
+    <input type="file" id="folderUploader" class="hidden" webkitdirectory directory multiple>
+
 
     <script type="module" src="index.js"></script>
 </body>
-</html><link rel="stylesheet" href="index.css">
-<script src="index.tsx" type="module"></script>
+</html>
