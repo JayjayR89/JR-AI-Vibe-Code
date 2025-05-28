@@ -1,3 +1,4 @@
+
 /* CSS Reset */
 * {
     margin: 0;
@@ -207,6 +208,8 @@ body.light-mode .panel { background-color: var(--panel-bg-light); border-color: 
 
 #aiToolsPanel { flex: 0 0 300px; }
 #codeFilesPanel, #previewAppPanel { flex: 1 1 50%; }
+#codeFilesPanel { display: flex; flex-direction: column; } /* Ensure panel structure for flex children */
+
 
 .panel-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; font-weight: 500; flex-shrink: 0; font-size: 0.9em; border-bottom: 1px solid; }
 body.dark-mode .panel-header { background-color: rgba(0,0,0,0.1); border-color: var(--divider-color-dark); color: var(--subtle-text-dark); }
@@ -225,7 +228,6 @@ body.light-mode .panel-header-button:hover { color: var(--text-color-light); bac
 body.dark-mode .ai-tool-section:not(:last-child) { border-color: var(--divider-color-dark); }
 body.light-mode .ai-tool-section:not(:last-child) { border-color: var(--divider-color-light); }
 
-/* Ensure checkpoint section specific styles if needed, or ensure .setting-item adapts */
 #codeCheckpointsSection { margin-top: auto; /* Pushes to bottom if aiToolsContent is flex column */ }
 
 
@@ -240,8 +242,11 @@ body.dark-mode #codeCheckpointsSection .checkpoint-button:hover { background-col
 body.dark-mode .checkpoints-status-text { color: var(--subtle-text-dark); }
 body.light-mode .checkpoints-status-text { color: var(--subtle-text-light); }
 
-.input-area { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
-textarea { flex-grow: 1; padding: 8px; border-radius: 6px; resize: vertical; min-height: 60px; font-family: var(--font-family); font-size: 0.9em; border: 1px solid; }
+.action-button-row { display: flex; gap: 8px; margin-top: 8px; }
+.action-button-row .microphone-button { flex-shrink: 0; }
+.action-button-row button:not(.microphone-button) { flex-grow: 1; }
+
+textarea { width: 100%; padding: 8px; border-radius: 6px; resize: vertical; min-height: 60px; font-family: var(--font-family); font-size: 0.9em; border: 1px solid; margin-bottom: 8px; }
 body.dark-mode textarea { background-color: var(--input-bg-dark); color: var(--input-text-dark); border-color: var(--input-border-dark); }
 body.dark-mode textarea::placeholder { color: var(--placeholder-text-dark); }
 body.light-mode textarea { background-color: var(--input-bg-light); color: var(--input-text-light); border-color: var(--input-border-light); }
@@ -292,16 +297,73 @@ body.dark-mode .control-grid input, body.dark-mode .control-grid select {
 .element-editor-buttons { display: flex; gap: 10px; margin-top: 10px; }
 .element-editor-buttons button { flex-grow: 1; }
 
-#codeOutput { flex-grow: 1; overflow: auto; padding: 15px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace; font-size: 0.85em; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; }
+.files-toolbar {
+    display: flex;
+    align-items: center;
+    padding: 5px 10px;
+    border-bottom: 1px solid;
+    flex-shrink: 0;
+    gap: 5px;
+}
+body.dark-mode .files-toolbar { background-color: var(--panel-bg-dark); border-color: var(--panel-border-dark); }
+body.light-mode .files-toolbar { background-color: var(--panel-bg-light); border-color: var(--panel-border-light); }
+
+.file-tabs-container {
+    display: flex;
+    gap: 2px; /* Small gap between tabs */
+    overflow-x: auto; /* Allow scrolling if many tabs */
+    flex-grow: 1; /* Allow tabs to take available space */
+}
+
+.file-tab {
+    padding: 6px 10px;
+    font-size: 0.85em;
+    border-radius: 4px 4px 0 0;
+    cursor: pointer;
+    border: 1px solid transparent;
+    border-bottom: none;
+    white-space: nowrap; /* Prevent tab text from wrapping */
+}
+body.dark-mode .file-tab { color: var(--subtle-text-dark); }
+body.dark-mode .file-tab.active { background-color: var(--bg-color-dark); border-color: var(--panel-border-dark); color: var(--text-color-dark); }
+body.dark-mode .file-tab:not(.active):hover { background-color: var(--header-button-hover-bg-dark); }
+body.light-mode .file-tab { color: var(--subtle-text-light); }
+body.light-mode .file-tab.active { background-color: var(--bg-color-light); border-color: var(--panel-border-light); color: var(--text-color-light); }
+body.light-mode .file-tab:not(.active):hover { background-color: var(--header-button-hover-bg-light); }
+
+
+.file-actions { margin-left: auto; display: flex; gap: 5px; flex-shrink: 0; }
+.file-actions .header-button { font-size: 0.8em; padding: 4px 8px; }
+
+
+#codeOutputWrapper { 
+    flex-grow: 1; 
+    overflow: auto; 
+    padding: 15px; 
+}
+#codeOutput {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace; 
+    font-size: 0.85em; 
+    line-height: 1.5; 
+    white-space: pre-wrap; 
+    word-wrap: break-word;
+    outline: none; /* Remove focus outline for contenteditable */
+    display: block; /* Ensure it behaves like a block for padding and sizing */
+}
 body.dark-mode #codeOutput { color: var(--input-text-dark); }
 body.light-mode #codeOutput { color: var(--input-text-light); }
+
+.preview-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
 
 #previewFrame { flex-grow: 1; border: none; width: 100%; height: 100%; }
 body.dark-mode #previewFrame { background-color: var(--bg-color-dark); }
 body.light-mode #previewFrame { background-color: var(--bg-color-light); }
 
 /* Styles for element highlighting in previewFrame / pop-out */
-/* These are injected via JS, but good to have them here for reference or direct use if possible */
 .preview-element-hover-highlight {
     outline: 2px dashed var(--accent-color-dark) !important;
     cursor: pointer !important;
@@ -373,11 +435,29 @@ body.light-mode input:checked + .slider:before { transform: translateX(20px); }
 #modelListContainer { max-height: 250px; overflow-y: auto; padding: 5px; border-radius: 4px; margin-bottom: 15px; border: 1px solid; }
 body.dark-mode #modelListContainer { border-color: var(--input-border-dark); background-color: var(--input-bg-dark); }
 body.light-mode #modelListContainer { border-color: var(--input-border-light); background-color: var(--input-bg-light); }
-#modelListContainer div { display: flex; align-items: center; padding: 5px 8px; }
-#modelListContainer input[type="checkbox"] { margin-right: 10px; }
-#modelListContainer label { font-size: 0.9em; }
+.model-list-item { display: flex; align-items: center; justify-content: space-between; padding: 5px 8px; }
+.model-list-item label { flex-grow: 1; margin-left: 10px; font-size: 0.9em; }
+.model-list-item input[type="checkbox"] { margin-right: 0; } /* Checkbox is first now */
+.model-details-button {
+    padding: 3px 6px;
+    font-size: 0.8em;
+    margin-left: 10px;
+    border: 1px solid;
+    border-radius: 4px;
+    cursor: pointer;
+}
+body.dark-mode .model-details-button { background-color: var(--button-secondary-bg-dark); color: var(--button-secondary-text-dark); border-color: var(--button-secondary-border-dark); }
+body.dark-mode .model-details-button:hover { background-color: var(--button-secondary-hover-bg-dark); }
+body.light-mode .model-details-button { background-color: var(--button-secondary-bg-light); color: var(--button-secondary-text-light); border-color: var(--button-secondary-border-light); }
+body.light-mode .model-details-button:hover { background-color: var(--button-secondary-hover-bg-light); }
 
 .modal-action-button { padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 0.9em; min-width: 80px; border: 1px solid; }
+.modal-action-button.primary {
+    background-color: var(--button-primary-bg-dark); color: var(--button-primary-text-dark); border-color: var(--button-primary-border-dark);
+}
+.modal-action-button.primary:hover {
+    background-color: var(--button-primary-hover-bg-dark);
+}
 body.dark-mode .modal-action-button { background-color: var(--button-secondary-bg-dark); color: var(--button-secondary-text-dark); border-color: var(--button-secondary-border-dark); }
 body.dark-mode .modal-action-button:hover { background-color: var(--button-secondary-hover-bg-dark); }
 body.dark-mode #saveModelsButton { background-color: var(--button-primary-bg-dark); color: var(--button-primary-text-dark); border-color: var(--button-primary-border-dark); }
@@ -421,6 +501,106 @@ body.light-mode .checkpoint-list-item:hover {
 }
 .checkpoint-list-item strong { font-weight: 500; }
 .checkpoint-list-item .timestamp { font-size: 0.85em; opacity: 0.7; display: block; margin-top: 3px; }
+
+/* Welcome Modal Specifics */
+.project-type-list {
+    list-style: none;
+    padding: 0;
+    margin: 15px 0;
+}
+.project-type-list li {
+    margin-bottom: 10px;
+}
+.project-type-button {
+    display: block;
+    width: 100%;
+    padding: 15px 20px; /* Increased padding */
+    font-size: 1.05em;  /* Slightly larger text */
+    font-weight: 500;   /* Bolder text */
+    text-align: left;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+    border: 1px solid;
+}
+.project-type-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+body.dark-mode .project-type-button {
+    background-color: var(--button-secondary-bg-dark);
+    color: var(--button-secondary-text-dark);
+    border-color: var(--accent-color-dark); /* Use accent for border */
+}
+body.dark-mode .project-type-button:not(:disabled):hover {
+    background-color: var(--accent-color-dark);
+    color: var(--button-primary-text-dark);
+    border-color: var(--accent-color-dark);
+}
+body.light-mode .project-type-button {
+    background-color: var(--button-secondary-bg-light);
+    color: var(--button-secondary-text-light);
+    border-color: var(--accent-color-light); /* Use accent for border */
+}
+body.light-mode .project-type-button:not(:disabled):hover {
+    background-color: var(--accent-color-light);
+    color: var(--button-primary-text-light);
+    border-color: var(--accent-color-light);
+}
+
+
+/* Knowledge Tab Specifics */
+#knowledgeListContainer {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-top: 10px;
+}
+.knowledge-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    border: 1px solid;
+}
+body.dark-mode .knowledge-item { background-color: var(--input-bg-dark); border-color: var(--input-border-dark); }
+body.light-mode .knowledge-item { background-color: var(--input-bg-light); border-color: var(--input-border-light); }
+
+.knowledge-item-title {
+    flex-grow: 1;
+    font-size: 0.9em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-right: 10px;
+}
+.knowledge-item-actions { display: flex; align-items: center; gap: 10px; }
+.knowledge-item-actions .switch { margin-right: 5px; } /* Add some space before delete */
+.knowledge-item-actions .delete-knowledge-button {
+    background: none;
+    border: none;
+    color: var(--icon-color-dark); /* Default to dark, override for light */
+    cursor: pointer;
+    font-size: 1.1em;
+    padding: 2px;
+}
+body.light-mode .knowledge-item-actions .delete-knowledge-button { color: var(--icon-color-light); }
+.knowledge-item-actions .delete-knowledge-button:hover { color: #ff4d4d; }
+
+#addKnowledgeDocModal .standard-input, 
+#addKnowledgeDocModal .standard-textarea {
+    width: 100%; padding: 8px; border-radius: 6px; font-family: var(--font-family); font-size: 0.9em; border: 1px solid;
+}
+body.dark-mode #addKnowledgeDocModal .standard-input, 
+body.dark-mode #addKnowledgeDocModal .standard-textarea {
+    background-color: var(--input-bg-dark); color: var(--input-text-dark); border-color: var(--input-border-dark);
+}
+body.light-mode #addKnowledgeDocModal .standard-input, 
+body.light-mode #addKnowledgeDocModal .standard-textarea {
+    background-color: var(--input-bg-light); color: var(--input-text-light); border-color: var(--input-border-light);
+}
 
 
 a { text-decoration: none; }
