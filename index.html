@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibe Code Canvas – AI UI Builder</title>
+    <link rel="stylesheet" href="index.css">
+    <script src="https://js.puter.com/v2/"></script>
+<script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://esm.sh/@google/genai@^1.1.0"
+  }
+}
+</script>
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <div id="authContainer" class="auth-container">
+                <button id="loginButton" class="header-button">Login</button>
+                <div id="userInfo" class="hidden">
+                    <span id="usernameContainer"></span>
+                    <button id="logoutButton" class="header-button">Logout</button>
+                </div>
+            </div>
+        </div>
+        <div class="header-center">
+            <span class="model-label puter-model-label">Model:</span>
+            <select id="modelSelect" class="puter-model-select" aria-label="Select AI Model"></select>
+            <span id="geminiModelLabel" class="model-label hidden"></span>
+        </div>
+        <div class="header-right">
+            <button id="settingsButton" class="header-button icon-button" aria-label="Open Settings">⚙️ Settings</button>
+        </div>
+    </header>
+
+    <div class="secondary-header">
+        <div class="secondary-header-left">
+            <input type="text" id="appProjectNameInput" class="app-project-name-input" value="Vibe Code Project" aria-label="App Project Name">
+        </div>
+        <div class="secondary-header-center">
+            <!-- QR and GitHub buttons removed -->
+        </div>
+        <div class="secondary-header-right">
+            <!-- Save State button removed -->
+            <div class="dropdown">
+                <button id="downloadButton" class="header-button dropdown-toggle" aria-label="Download">📄 Download</button>
+                <div class="dropdown-content">
+                    <a href="#" id="downloadHtml">Download HTML</a>
+                    <a href="#" id="downloadZip">Download as ZIP</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main>
+        <div id="aiToolsPanel" class="panel">
+            <div class="panel-header">
+                <h3>AI Tools</h3>
+                <button id="toggleAiToolsPanel" class="panel-header-button" aria-label="Collapse AI Tools Panel">🔼</button>
+            </div>
+            <div id="aiToolsContent">
+                <div id="aiToolsSection1" class="ai-tool-section">
+                    <h4 id="aiToolsSection1Title">1. Describe your UI</h4>
+                    <div id="aiToolsSection1Content">
+                        <div class="input-area">
+                            <textarea id="generatePromptInput" rows="4" placeholder="e.g., a landing page hero section..."></textarea>
+                            <button id="generateMicrophoneButton" class="microphone-button" aria-label="Use Microphone for Generate Prompt">🎤</button>
+                        </div>
+                        <button id="generateCodeButton">Generate Code ➔</button>
+                        <p class="tip-text">Tip: Enter to submit, Shift+Enter for new line.</p>
+                    </div>
+                    <div id="generatedPromptDisplay" class="minimized-prompt-display hidden">
+                        <p><strong>Your UI description:</strong></p>
+                        <p id="displayedGeneratePrompt"></p>
+                        <button id="editInitialPromptButton">Edit Description</button>
+                    </div>
+                </div>
+
+                <div id="aiToolsSection2" class="ai-tool-section hidden">
+                    <h4>2. Modify app</h4>
+                    <div class="input-area">
+                        <textarea id="modifyPromptInput" rows="3" placeholder="e.g., Change the background color to lightblue..."></textarea>
+                        <button id="modifyMicrophoneButton" class="microphone-button" aria-label="Use Microphone for Modify Prompt">🎤</button>
+                    </div>
+                    <button id="modifyCodeButton">Modify Code ➔</button>
+                </div>
+
+                <div id="aiToolsSection3" class="ai-tool-section hidden">
+                    <h4>3. Edit Element</h4>
+                    <button id="selectElementButton">Select Element to Edit</button>
+                    <div id="elementEditorControls" class="hidden" style="margin-top: 10px;">
+                        <h5>Editing: <span id="selectedElementIdentifier">N/A</span></h5>
+                        <div class="control-grid">
+                            <div><label for="elementTextContent">Text Content:</label><input type="text" id="elementTextContent"></div>
+                            <div><label for="elementColor">Text Color:</label><input type="color" id="elementColor" value="#000000"></div>
+                            <div><label for="elementBgColor">Background Color:</label><input type="color" id="elementBgColor" value="#FFFFFF"></div>
+                            <div><label for="elementWidth">Width:</label><input type="text" id="elementWidth" placeholder="e.g., 100px or 50%"></div>
+                            <div><label for="elementHeight">Height:</label><input type="text" id="elementHeight" placeholder="e.g., 50px or auto"></div>
+                            <div><label for="elementPadding">Padding:</label><input type="text" id="elementPadding" placeholder="e.g., 10px"></div>
+                            <div><label for="elementMargin">Margin:</label><input type="text" id="elementMargin" placeholder="e.g., 10px"></div>
+                            <div>
+                                <label for="elementPosition">Position:</label>
+                                <select id="elementPosition">
+                                    <option value="static">Static</option>
+                                    <option value="relative">Relative</option>
+                                    <option value="absolute">Absolute</option>
+                                    <option value="fixed">Fixed</option>
+                                    <option value="sticky">Sticky</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="elementDisplay">Display:</label>
+                                <select id="elementDisplay">
+                                    <option value="block">Block</option>
+                                    <option value="inline">Inline</option>
+                                    <option value="inline-block">Inline-Block</option>
+                                    <option value="flex">Flex</option>
+                                    <option value="grid">Grid</option>
+                                    <option value="none">None</option>
+                                </select>
+                            </div>
+                            <div><label for="elementBorder">Border:</label><input type="text" id="elementBorder" placeholder="e.g., 1px solid black"></div>
+                        </div>
+                        <p class="ai-edit-label">Or describe changes with AI:</p>
+                        <textarea id="editElementPromptInput" rows="2" placeholder="e.g., make this button rounded with a blue border"></textarea>
+                        <div class="element-editor-buttons">
+                            <button id="saveManualElementChangesButton">Apply Manual Changes</button>
+                            <button id="applyElementAIEditButton">Apply AI Edit</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ai-tool-section" id="codeCheckpointsSection">
+                    <h4>Code Checkpoints</h4>
+                    <div class="setting-item" style="padding: 5px 0;">
+                        <label for="autoCreateCheckpointToggle">Auto-create checkpoints on prompt</label>
+                        <label class="switch">
+                            <input type="checkbox" id="autoCreateCheckpointToggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <button id="createCheckpointButton" class="checkpoint-button">➕ Create Checkpoint</button>
+                    <button id="viewRestoreCheckpointsButton" class="checkpoint-button">🔄 View & Restore Checkpoints</button>
+                    <p id="checkpointsStatus" class="checkpoints-status-text">No checkpoints created yet.</p>
+                </div>
+            </div>
+        </div>
+        <div id="codeFilesPanel" class="panel">
+            <div class="panel-header">
+                <h3>Generated Code</h3>
+                <button id="filesButton" class="panel-header-button" aria-label="Files">📄 Files</button>
+            </div>
+            <pre id="codeOutput"><code>No code generated yet. Enter a prompt to start.</code></pre>
+        </div>
+        <div id="previewAppPanel" class="panel">
+            <div class="panel-header">
+                <h3>Live Preview</h3>
+                <div>
+                    <button id="selectElementsToggle" class="panel-header-button">Select Elements: OFF</button>
+                    <button id="popOutButton" class="panel-header-button" aria-label="Pop-out Preview">↗️ Pop-out</button>
+                    <button id="fullscreenButton" class="panel-header-button" aria-label="Fullscreen Preview">↔️ Fullscreen</button>
+                </div>
+            </div>
+            <iframe id="previewFrame" title="App Preview" sandbox="allow-scripts allow-same-origin"></iframe>
+        </div>
+    </main>
+
+    <div id="settingsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="settingsModalTitle">Settings</h2>
+                <button id="closeSettingsModal" class="close-button" aria-label="Close Settings">&times;</button>
+            </div>
+            <div class="tabs">
+                <button class="tab-button active" data-tab="uiSettingsTab">UI</button>
+                <button class="tab-button" data-tab="modelSettingsTab">Models</button>
+                <button class="tab-button" data-tab="generalSettingsTab">General</button>
+                <button class="tab-button" data-tab="aboutSettingsTab">About</button>
+            </div>
+
+            <div id="uiSettingsTab" class="tab-content active">
+                <h3>UI Settings</h3>
+                <div class="setting-item">
+                    <label for="darkModeToggle">Dark Mode</label>
+                    <label class="switch">
+                        <input type="checkbox" id="darkModeToggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label for="tooltipsToggle">Enable Tooltips</label>
+                    <label class="switch">
+                        <input type="checkbox" id="tooltipsToggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div id="modelSettingsTab" class="tab-content">
+                <h3>API & Model Selection</h3>
+                 <div class="setting-item">
+                    <label for="geminiApiToggle">Enable Gemini API</label>
+                    <label class="switch">
+                        <input type="checkbox" id="geminiApiToggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <p style="margin-top: 15px;">Select Puter.com models (active if Gemini API is disabled):</p>
+                <div id="modelListContainer" role="listbox" aria-multiselectable="true"></div>
+                <button id="saveModelsButton" class="modal-action-button">Save Puter Model Selection</button>
+            </div>
+
+            <div id="generalSettingsTab" class="tab-content">
+                <h3>General Settings</h3>
+                <div class="setting-item">
+                    <label for="appMemoryToggle">Enable App Memory (Chat History)</label>
+                    <label class="switch">
+                        <input type="checkbox" id="appMemoryToggle" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label for="fileContextToggle">Enable File Context (Experimental)</label>
+                    <label class="switch">
+                        <input type="checkbox" id="fileContextToggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div id="aboutSettingsTab" class="tab-content">
+                <h3>About Vibe Code Canvas</h3>
+                <p>
+                    Created by <a href="https://jayreddin.github.io" target="_blank" rel="noopener noreferrer">Jamie Reddin</a> using the <a href="https://puter.com" target="_blank" rel="noopener noreferrer">Puter.com</a> <a href="https://docs.puter.com" target="_blank" rel="noopener noreferrer">API</a> and Google Gemini API. || Version <span id="appVersion">1.0.5</span>
+                </p>
+                <h4>Features:</h4>
+                <ul>
+                    <li>AI-powered UI generation & modification</li>
+                    <li>Real-time element editing (in-app & pop-out)</li>
+                    <li>Live application preview & Pop-out</li>
+                    <li>Customizable interface and model selection (Puter/Gemini)</li>
+                    <li>Secure authentication via Puter</li>
+                    <li>Code Checkpoints (Manual & Automatic, with Restore)</li>
+                    <li>Tooltips</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button id="closeSettingsModalFooter" class="modal-action-button" aria-label="Close Settings">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="restoreCheckpointsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="restoreCheckpointsModalTitle">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="restoreCheckpointsModalTitle">View & Restore Checkpoints</h2>
+                <button id="closeRestoreCheckpointsModal" class="close-button" aria-label="Close Restore Checkpoints Modal">&times;</button>
+            </div>
+            <div id="checkpointsListContainer" class="tab-content active" style="padding: 20px;">
+                <!-- Checkpoints will be listed here by JS -->
+                <p id="noCheckpointsMessage">No checkpoints available to restore.</p>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelRestoreCheckpointButton" class="modal-action-button">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+
+    <script type="module" src="index.js"></script>
+</body>
+</html><link rel="stylesheet" href="index.css">
+<script src="index.tsx" type="module"></script>
