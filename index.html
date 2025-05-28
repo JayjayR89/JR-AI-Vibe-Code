@@ -219,11 +219,21 @@
                         <span class="slider round"></span>
                     </label>
                 </div>
-                <p style="margin-top: 15px;">Select Puter.com models (active if Gemini API is disabled):</p>
-                <div id="modelListContainer" role="listbox" aria-multiselectable="true">
+                <div class="setting-item gemini-api-key-container" id="geminiApiKeyContainer" style="display: none; flex-direction: column; align-items: flex-start; gap: 8px;">
+                    <label for="geminiApiKeyInput" style="font-weight:500;">Gemini API Key:</label>
+                    <div class="api-key-input-wrapper" style="display: flex; width: 100%; gap: 5px;">
+                        <input type="password" id="geminiApiKeyInput" placeholder="Enter your Gemini API key" class="api-key-input" style="flex-grow: 1;">
+                        <button id="toggleApiKeyVisibility" class="toggle-password-visibility header-button" type="button" aria-label="Toggle API key visibility" style="flex-shrink: 0;">👁️</button>
+                    </div>
+                    <button id="saveGeminiApiKey" class="modal-action-button primary" style="align-self: flex-start;">Save API Key</button>
+                    <p class="api-key-status" id="geminiApiKeyStatus" style="font-size: 0.85em; margin-top: 5px;"></p>
+                    <p class="api-key-help" style="font-size: 0.85em;">Get your API key from <a href="https://makersuite.google.com/app/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio</a>.</p>
+                </div>
+                <p style="margin-top: 15px;" class="puter-model-settings">Select Puter.com models (active if Gemini API is disabled):</p>
+                <div id="modelListContainer" class="puter-model-settings" role="listbox" aria-multiselectable="true">
                     <!-- Models populated by JS -->
                 </div>
-                <button id="saveModelsButton" class="modal-action-button">Save Puter Model Selection</button>
+                <button id="saveModelsButton" class="modal-action-button puter-model-settings">Save Puter Model Selection</button>
             </div>
             
             <div id="knowledgeSettingsTab" class="tab-content">
@@ -256,7 +266,7 @@
             <div id="aboutSettingsTab" class="tab-content">
                 <h3>About Vibe Code Canvas</h3>
                 <p>
-                    Created by <a href="https://jayreddin.github.io" target="_blank" rel="noopener noreferrer">Jamie Reddin</a> using the <a href="https://puter.com" target="_blank" rel="noopener noreferrer">Puter.com</a> <a href="https://docs.puter.com" target="_blank" rel="noopener noreferrer">API</a> and Google Gemini API. || Version <span id="appVersion">1.0.7</span>
+                    Created by <a href="https://jayreddin.github.io" target="_blank" rel="noopener noreferrer">Jamie Reddin</a> using the <a href="https://puter.com" target="_blank" rel="noopener noreferrer">Puter.com</a> <a href="https://docs.puter.com" target="_blank" rel="noopener noreferrer">API</a> and Google Gemini API. || Version <span id="appVersion">1.0.8</span>
                 </p>
                 <h4>Features:</h4>
                 <ul>
@@ -264,7 +274,7 @@
                     <li>Multi-file support (HTML, CSS, JS, MD etc.) with tabbed editor</li>
                     <li>Real-time element editing (in-app & pop-out)</li>
                     <li>Live application preview & Pop-out</li>
-                    <li>Customizable interface and model selection (Puter/Gemini)</li>
+                    <li>Customizable interface and model selection (Puter/Gemini with user-provided API key)</li>
                     <li>Secure authentication via Puter</li>
                     <li>Code Checkpoints (Manual & Automatic, with Restore for all project files)</li>
                     <li>Tooltips, Knowledge Base Integration</li>
@@ -355,4 +365,5 @@
 
     <script type="module" src="index.js"></script>
 </body>
-</html>
+</html><link rel="stylesheet" href="index.css">
+<script src="index.tsx" type="module"></script>
