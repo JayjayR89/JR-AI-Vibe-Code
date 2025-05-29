@@ -42,6 +42,8 @@ html, body {
     --modal-shadow-dark: 0 8px 24px rgba(0,0,0,0.5);
     --subtle-text-dark: #8b949e;
     --divider-color-dark: #21262e;
+    --error-color-dark: #f85149;
+
 
     /* Light Theme Variables */
     --bg-color-light: #f0f2f5;
@@ -74,6 +76,7 @@ html, body {
     --modal-shadow-light: 0 8px 24px rgba(140,149,159,0.2);
     --subtle-text-light: #57606a;
     --divider-color-light: #d0d7de;
+    --error-color-light: #d73a49;
 }
 
 body {
@@ -154,6 +157,24 @@ body.light-mode .app-project-name-input:focus {
     background-color: var(--input-bg-light); 
 }
 
+.icon-button .icon {
+    width: 1em; /* Adjust as needed */
+    height: 1em; /* Adjust as needed */
+    margin-right: 0.4em;
+    vertical-align: text-bottom; /* Or middle, or adjust as needed */
+}
+.panel-header-button .icon, .preview-icon-button .icon, .close-button .icon, .microphone-button .icon {
+    margin-right: 0; /* No text next to these */
+    width: 1.2em; /* Slightly larger for icon-only buttons */
+    height: 1.2em;
+}
+.close-button .icon {
+    width: 1em; height: 1em;
+}
+.microphone-button .icon {
+    width: 1.1em; height: 1.1em; /* Specific size for mic */
+}
+
 
 .header-button {
     padding: 5px 10px;
@@ -163,6 +184,9 @@ body.light-mode .app-project-name-input:focus {
     transition: background-color 0.2s, border-color 0.2s;
     border: 1px solid;
     white-space: nowrap;
+    display: inline-flex; /* For icon alignment */
+    align-items: center; /* For icon alignment */
+    justify-content: center; /* For icon alignment */
 }
 body.dark-mode .header-button { background-color: var(--header-button-bg-dark); color: var(--header-button-text-dark); border-color: var(--header-button-border-dark); }
 body.dark-mode .header-button:hover { background-color: var(--header-button-hover-bg-dark); border-color: #555; }
@@ -207,18 +231,38 @@ body.light-mode .panel { background-color: var(--panel-bg-light); border-color: 
 
 #aiToolsPanel { flex: 0 0 300px; }
 #codeFilesPanel, #previewAppPanel { flex: 1 1 50%; }
-#codeFilesPanel { display: flex; flex-direction: column; } /* Ensure panel structure for flex children */
-
 
 .panel-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; font-weight: 500; flex-shrink: 0; font-size: 0.9em; border-bottom: 1px solid; }
 body.dark-mode .panel-header { background-color: rgba(0,0,0,0.1); border-color: var(--divider-color-dark); color: var(--subtle-text-dark); }
 body.light-mode .panel-header { background-color: rgba(0,0,0,0.03); border-color: var(--divider-color-light); color: var(--subtle-text-light); }
 .panel-header h3 { margin: 0; font-size: 1em; font-weight: 500; }
-.panel-header-button { background: none; border: none; cursor: pointer; padding: 4px; font-size: 0.9em; }
+.panel-header-button { background: none; border: none; cursor: pointer; padding: 4px; font-size: 0.9em; display: inline-flex; align-items: center; }
 body.dark-mode .panel-header-button { color: var(--icon-color-dark); }
 body.dark-mode .panel-header-button:hover { color: var(--text-color-dark); background-color: var(--header-button-hover-bg-dark); border-radius: 4px; }
 body.light-mode .panel-header-button { color: var(--icon-color-light); }
 body.light-mode .panel-header-button:hover { color: var(--text-color-light); background-color: var(--header-button-hover-bg-light); border-radius: 4px; }
+
+/* Preview Panel Icon Buttons */
+.preview-icon-button {
+    font-size: 1.1em; 
+    padding: 4px 6px; 
+    line-height: 1;
+    border: 1px solid;
+    border-radius: 4px;
+    margin-left: 5px;
+}
+body.dark-mode .preview-icon-button {
+    border-color: var(--header-button-border-dark);
+}
+body.light-mode .preview-icon-button {
+    border-color: var(--header-button-border-light);
+}
+.panel-header > div { /* Container for preview header buttons */
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
 
 #aiToolsContent { padding: 15px; overflow-y: auto; flex-grow: 1; display: flex; flex-direction: column;}
 
@@ -234,32 +278,68 @@ body.light-mode .ai-tool-section:not(:last-child) { border-color: var(--divider-
 body.dark-mode .ai-tool-section h4 { color: var(--subtle-text-dark); }
 body.light-mode .ai-tool-section h4 { color: var(--subtle-text-light); }
 
-#codeCheckpointsSection .checkpoint-button { display: block; width: calc(100% - 20px); margin: 0 auto 8px; padding: 8px 12px; font-size: 0.9em; text-align: left; border: 1px solid; }
+#codeCheckpointsSection .checkpoint-button { display: flex; width: calc(100% - 20px); margin: 0 auto 8px; padding: 8px 12px; font-size: 0.9em; text-align: left; border: 1px solid; }
 body.dark-mode #codeCheckpointsSection .checkpoint-button { background-color: var(--button-secondary-bg-dark); color: var(--button-secondary-text-dark); border-color: var(--button-secondary-border-dark); }
 body.dark-mode #codeCheckpointsSection .checkpoint-button:hover { background-color: var(--button-secondary-hover-bg-dark); }
 .checkpoints-status-text { font-size: 0.8em; margin-top: 5px; text-align: center; }
 body.dark-mode .checkpoints-status-text { color: var(--subtle-text-dark); }
 body.light-mode .checkpoints-status-text { color: var(--subtle-text-light); }
 
-.action-button-row { display: flex; gap: 8px; margin-top: 8px; }
-.action-button-row .microphone-button { flex-shrink: 0; }
-.action-button-row button:not(.microphone-button) { flex-grow: 1; }
+.action-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+.action-row > .microphone-button {
+    padding: 8px; /* Adjust if needed */
+    flex-shrink: 0; /* Prevent shrinking */
+}
+.action-row > #generateCodeButton, .action-row > #modifyCodeButton {
+    flex-grow: 1; /* Allow main button to take remaining space */
+    margin-top: 0; /* Override existing margin-top */
+}
 
-textarea { width: 100%; padding: 8px; border-radius: 6px; resize: vertical; min-height: 60px; font-family: var(--font-family); font-size: 0.9em; border: 1px solid; margin-bottom: 8px; }
+textarea { width: 100%; padding: 8px; border-radius: 6px; resize: vertical; min-height: 60px; font-family: var(--font-family); font-size: 0.9em; border: 1px solid; }
 body.dark-mode textarea { background-color: var(--input-bg-dark); color: var(--input-text-dark); border-color: var(--input-border-dark); }
 body.dark-mode textarea::placeholder { color: var(--placeholder-text-dark); }
 body.light-mode textarea { background-color: var(--input-bg-light); color: var(--input-text-light); border-color: var(--input-border-light); }
 body.light-mode textarea::placeholder { color: var(--placeholder-text-light); }
 
-.microphone-button { background: none; border: 1px solid; cursor: pointer; font-size: 1.2em; padding: 8px; border-radius: 6px; }
+.microphone-button { background: none; border: 1px solid; cursor: pointer; font-size: 1.2em; padding: 8px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; }
 body.dark-mode .microphone-button { color: var(--icon-color-dark); border-color: var(--input-border-dark); }
 body.dark-mode .microphone-button:hover { background-color: var(--header-button-hover-bg-dark); color: var(--text-color-dark); }
 body.light-mode .microphone-button { color: var(--icon-color-light); border-color: var(--input-border-light); }
 body.light-mode .microphone-button:hover { background-color: var(--header-button-hover-bg-light); color: var(--text-color-light); }
 .microphone-button:disabled { opacity: 0.5; cursor: not-allowed; }
 
+.microphone-button.recording .icon {
+    animation: pulse-red 1.5s infinite;
+}
+body.dark-mode .microphone-button.recording .icon {
+    color: var(--error-color-dark);
+    box-shadow: 0 0 8px var(--error-color-dark);
+}
+body.light-mode .microphone-button.recording .icon {
+    color: var(--error-color-light);
+    box-shadow: 0 0 8px var(--error-color-light);
+}
+
+@keyframes pulse-red {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* AI Tools Section 3 - Textarea width */
+textarea#editElementPromptInput {
+    width: 100%;
+}
+
 #generateCodeButton, #modifyCodeButton, #applyElementAIEditButton, #saveManualElementChangesButton, #selectElementButton, #editInitialPromptButton {
     padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 0.9em; width: 100%; margin-top: 5px; border: 1px solid;
+    display: inline-flex; align-items: center; justify-content: center; /* For icons, if any added later */
 }
 body.dark-mode #generateCodeButton, body.dark-mode #modifyCodeButton, body.dark-mode #applyElementAIEditButton, body.dark-mode #saveManualElementChangesButton {
     background-color: var(--button-primary-bg-dark); color: var(--button-primary-text-dark); border-color: var(--button-primary-border-dark); font-weight: 500;
@@ -296,67 +376,63 @@ body.dark-mode .control-grid input, body.dark-mode .control-grid select {
 .element-editor-buttons { display: flex; gap: 10px; margin-top: 10px; }
 .element-editor-buttons button { flex-grow: 1; }
 
-.files-toolbar {
+/* File Explorer Styles */
+#fileExplorer {
+    padding: 10px;
+    height: 100%; /* Or control height as needed */
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+.file-explorer-toolbar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid;
+}
+body.dark-mode .file-explorer-toolbar { border-color: var(--divider-color-dark); }
+body.light-mode .file-explorer-toolbar { border-color: var(--divider-color-light); }
+
+.file-explorer-toolbar .panel-header-button { /* Reuse styling, but make them smaller */
+    padding: 5px 8px;
+    font-size: 0.85em;
+    border: 1px solid;
+}
+body.dark-mode .file-explorer-toolbar .panel-header-button { border-color: var(--header-button-border-dark); }
+body.light-mode .file-explorer-toolbar .panel-header-button { border-color: var(--header-button-border-light); }
+
+
+.file-tree-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+.file-tree-list li {
+    padding: 6px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-bottom: 2px;
+    font-size: 0.9em;
     display: flex;
     align-items: center;
-    padding: 5px 10px;
-    border-bottom: 1px solid;
-    flex-shrink: 0;
-    gap: 5px;
 }
-body.dark-mode .files-toolbar { background-color: var(--panel-bg-dark); border-color: var(--panel-border-dark); }
-body.light-mode .files-toolbar { background-color: var(--panel-bg-light); border-color: var(--panel-border-light); }
-
-.file-tabs-container {
-    display: flex;
-    gap: 2px; /* Small gap between tabs */
-    overflow-x: auto; /* Allow scrolling if many tabs */
-    flex-grow: 1; /* Allow tabs to take available space */
+.file-tree-list li .icon {
+    margin-right: 8px;
+    width: 1em;
+    height: 1em;
 }
-
-.file-tab {
-    padding: 6px 10px;
-    font-size: 0.85em;
-    border-radius: 4px 4px 0 0;
-    cursor: pointer;
-    border: 1px solid transparent;
-    border-bottom: none;
-    white-space: nowrap; /* Prevent tab text from wrapping */
-}
-body.dark-mode .file-tab { color: var(--subtle-text-dark); }
-body.dark-mode .file-tab.active { background-color: var(--bg-color-dark); border-color: var(--panel-border-dark); color: var(--text-color-dark); }
-body.dark-mode .file-tab:not(.active):hover { background-color: var(--header-button-hover-bg-dark); }
-body.light-mode .file-tab { color: var(--subtle-text-light); }
-body.light-mode .file-tab.active { background-color: var(--bg-color-light); border-color: var(--panel-border-light); color: var(--text-color-light); }
-body.light-mode .file-tab:not(.active):hover { background-color: var(--header-button-hover-bg-light); }
+body.dark-mode .file-tree-list li:hover { background-color: var(--header-button-hover-bg-dark); }
+body.dark-mode .file-tree-list li.active-file { background-color: var(--accent-color-dark); color: var(--button-primary-text-dark); }
+body.light-mode .file-tree-list li:hover { background-color: var(--header-button-hover-bg-light); }
+body.light-mode .file-tree-list li.active-file { background-color: var(--accent-color-light); color: var(--button-primary-text-light); }
 
 
-.file-actions { margin-left: auto; display: flex; gap: 5px; flex-shrink: 0; }
-.file-actions .header-button { font-size: 0.8em; padding: 4px 8px; }
-
-
-#codeOutputWrapper { 
-    flex-grow: 1; 
-    overflow: auto; 
-    padding: 15px; 
-}
-#codeOutput {
-    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace; 
-    font-size: 0.85em; 
-    line-height: 1.5; 
-    white-space: pre-wrap; 
-    word-wrap: break-word;
-    outline: none; /* Remove focus outline for contenteditable */
-    display: block; /* Ensure it behaves like a block for padding and sizing */
-}
+#codeOutput { flex-grow: 1; overflow: auto; padding: 15px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace; font-size: 0.85em; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; }
 body.dark-mode #codeOutput { color: var(--input-text-dark); }
 body.light-mode #codeOutput { color: var(--input-text-light); }
-
-.preview-controls {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
 
 #previewFrame { flex-grow: 1; border: none; width: 100%; height: 100%; }
 body.dark-mode #previewFrame { background-color: var(--bg-color-dark); }
@@ -392,11 +468,11 @@ body.light-mode .modal-content { background-color: var(--modal-bg-light); box-sh
 body.dark-mode .modal-header { border-color: var(--divider-color-dark); }
 body.light-mode .modal-header { border-color: var(--divider-color-light); }
 .modal-header h2 { margin: 0; font-size: 1.2em; }
-.close-button { background: none; border: none; font-size: 1.8em; cursor: pointer; line-height: 1; }
+.close-button { background: none; border: none; font-size: 1.2em; /* Adjusted for SVG */ cursor: pointer; line-height: 1; padding: 4px; }
 body.dark-mode .close-button { color: var(--icon-color-dark); }
-body.dark-mode .close-button:hover { color: var(--text-color-dark); }
+body.dark-mode .close-button:hover { color: var(--text-color-dark); background-color: var(--header-button-hover-bg-dark); border-radius: 4px;}
 body.light-mode .close-button { color: var(--icon-color-light); }
-body.light-mode .close-button:hover { color: var(--text-color-light); }
+body.light-mode .close-button:hover { color: var(--text-color-light); background-color: var(--header-button-hover-bg-light); border-radius: 4px;}
 
 .tabs { display: flex; padding: 0 10px; border-bottom: 1px solid; }
 body.dark-mode .tabs { border-color: var(--divider-color-dark); }
@@ -416,6 +492,11 @@ body.light-mode .tab-button:hover:not(.active) { color: var(--text-color-light);
 .tab-content p { font-size: 0.9em; line-height: 1.5; }
 .tab-content ul { padding-left: 20px; font-size: 0.9em; }
 
+/* Hide scrollbar for specific tab content */
+#modelSettingsTab::-webkit-scrollbar { display: none; }
+#modelSettingsTab { -ms-overflow-style: none;  /* IE and Edge */ scrollbar-width: none;  /* Firefox */ }
+
+
 .setting-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; font-size: 0.9em; }
 .setting-item label:first-child { flex-grow: 1; margin-right: 10px; }
 
@@ -434,70 +515,54 @@ body.light-mode input:checked + .slider:before { transform: translateX(20px); }
 #modelListContainer { max-height: 250px; overflow-y: auto; padding: 5px; border-radius: 4px; margin-bottom: 15px; border: 1px solid; }
 body.dark-mode #modelListContainer { border-color: var(--input-border-dark); background-color: var(--input-bg-dark); }
 body.light-mode #modelListContainer { border-color: var(--input-border-light); background-color: var(--input-bg-light); }
-.model-list-item { display: flex; align-items: center; justify-content: space-between; padding: 5px 8px; }
-.model-list-item label { flex-grow: 1; margin-left: 10px; font-size: 0.9em; }
-.model-list-item input[type="checkbox"] { margin-right: 0; } /* Checkbox is first now */
+
+/* Hide scrollbar for model list container */
+#modelListContainer::-webkit-scrollbar { display: none; }
+#modelListContainer { -ms-overflow-style: none; scrollbar-width: none; }
+
+
+#modelListContainer div { display: flex; align-items: center; padding: 5px 8px; }
+#modelListContainer input[type="checkbox"] { margin-right: 10px; flex-shrink: 0; }
+#modelListContainer label { font-size: 0.9em; flex-grow: 1; margin-right: 8px; word-break: break-all;}
+
 .model-details-button {
-    padding: 3px 6px;
+    margin-left: auto; /* Pushes to the right */
+    padding: 4px 8px;
     font-size: 0.8em;
-    margin-left: 10px;
-    border: 1px solid;
-    border-radius: 4px;
-    cursor: pointer;
+    flex-shrink: 0; /* Prevent shrinking */
+    /* Reuses modal-action-button styles via JS, or define custom here */
 }
-body.dark-mode .model-details-button { background-color: var(--button-secondary-bg-dark); color: var(--button-secondary-text-dark); border-color: var(--button-secondary-border-dark); }
-body.dark-mode .model-details-button:hover { background-color: var(--button-secondary-hover-bg-dark); }
-body.light-mode .model-details-button { background-color: var(--button-secondary-bg-light); color: var(--button-secondary-text-light); border-color: var(--button-secondary-border-light); }
-body.light-mode .model-details-button:hover { background-color: var(--button-secondary-hover-bg-light); }
-
-.api-key-input-wrapper { display: flex; width: 100%; gap: 5px; margin-bottom: 8px;}
-.api-key-input {
-    flex-grow: 1;
-    padding: 6px 10px;
-    border-radius: 4px;
-    border: 1px solid;
-    font-size: 0.9em;
+body.dark-mode .model-details-button {
+    /* Specific dark mode overrides if needed, defaults to .modal-action-button */
 }
-body.dark-mode .api-key-input { background-color: var(--input-bg-dark); color: var(--input-text-dark); border-color: var(--input-border-dark); }
-body.light-mode .api-key-input { background-color: var(--input-bg-light); color: var(--input-text-light); border-color: var(--input-border-light); }
-body.dark-mode .api-key-input::placeholder { color: var(--placeholder-text-dark); }
-body.light-mode .api-key-input::placeholder { color: var(--placeholder-text-light); }
-
-.toggle-password-visibility {
-    padding: 6px 10px;
-    font-size: 0.9em;
-    flex-shrink: 0;
+body.light-mode .model-details-button {
+    /* Specific light mode overrides if needed */
 }
-
-.api-key-help {
-    font-size: 0.85em;
-    margin-top: 5px;
-}
-body.dark-mode .api-key-help { color: var(--subtle-text-dark); }
-body.light-mode .api-key-help { color: var(--subtle-text-light); }
 
 .modal-action-button { padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 0.9em; min-width: 80px; border: 1px solid; }
-.modal-action-button.primary {
-    background-color: var(--button-primary-bg-dark); color: var(--button-primary-text-dark); border-color: var(--button-primary-border-dark);
-}
-.modal-action-button.primary:hover {
-    background-color: var(--button-primary-hover-bg-dark);
-}
 body.dark-mode .modal-action-button { background-color: var(--button-secondary-bg-dark); color: var(--button-secondary-text-dark); border-color: var(--button-secondary-border-dark); }
 body.dark-mode .modal-action-button:hover { background-color: var(--button-secondary-hover-bg-dark); }
-body.dark-mode #saveModelsButton, body.dark-mode #saveGeminiApiKey { background-color: var(--button-primary-bg-dark); color: var(--button-primary-text-dark); border-color: var(--button-primary-border-dark); }
-body.dark-mode #saveModelsButton:hover, body.dark-mode #saveGeminiApiKey:hover { background-color: var(--button-primary-hover-bg-dark); }
-body.light-mode .modal-action-button.primary {
-    background-color: var(--button-primary-bg-light); color: var(--button-primary-text-light); border-color: var(--button-primary-border-light);
+body.dark-mode #saveModelsButton, 
+body.dark-mode .primary-confirm-button { 
+    background-color: var(--button-primary-bg-dark); color: var(--button-primary-text-dark); border-color: var(--button-primary-border-dark); 
 }
-body.light-mode .modal-action-button.primary:hover {
-    background-color: var(--button-primary-hover-bg-light);
+body.dark-mode #saveModelsButton:hover,
+body.dark-mode .primary-confirm-button:hover { 
+    background-color: var(--button-primary-hover-bg-dark); 
 }
-body.light-mode #saveModelsButton, body.light-mode #saveGeminiApiKey { background-color: var(--button-primary-bg-light); color: var(--button-primary-text-light); border-color: var(--button-primary-border-light); }
-body.light-mode #saveModelsButton:hover, body.light-mode #saveGeminiApiKey:hover { background-color: var(--button-primary-hover-bg-light); }
+body.light-mode .modal-action-button { background-color: var(--button-secondary-bg-light); color: var(--button-secondary-text-light); border-color: var(--button-secondary-border-light); }
+body.light-mode .modal-action-button:hover { background-color: var(--button-secondary-hover-bg-light); }
+body.light-mode #saveModelsButton,
+body.light-mode .primary-confirm-button { 
+    background-color: var(--button-primary-bg-light); color: var(--button-primary-text-light); border-color: var(--button-primary-border-light); 
+}
+body.light-mode #saveModelsButton:hover,
+body.light-mode .primary-confirm-button:hover { 
+    background-color: var(--button-primary-hover-bg-light); 
+}
 
 
-.modal-footer { padding: 15px 20px; text-align: right; border-top: 1px solid; }
+.modal-footer { padding: 15px 20px; display: flex; justify-content: flex-end; align-items: center; gap: 10px; border-top: 1px solid; }
 body.dark-mode .modal-footer { border-color: var(--divider-color-dark); }
 body.light-mode .modal-footer { border-color: var(--divider-color-light); }
 
@@ -536,106 +601,6 @@ body.light-mode .checkpoint-list-item:hover {
 .checkpoint-list-item strong { font-weight: 500; }
 .checkpoint-list-item .timestamp { font-size: 0.85em; opacity: 0.7; display: block; margin-top: 3px; }
 
-/* Welcome Modal Specifics */
-.project-type-list {
-    list-style: none;
-    padding: 0;
-    margin: 15px 0;
-}
-.project-type-list li {
-    margin-bottom: 10px;
-}
-.project-type-button {
-    display: block;
-    width: 100%;
-    padding: 15px 20px; /* Increased padding */
-    font-size: 1.05em;  /* Slightly larger text */
-    font-weight: 500;   /* Bolder text */
-    text-align: left;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
-    border: 1px solid;
-}
-.project-type-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-body.dark-mode .project-type-button {
-    background-color: var(--button-secondary-bg-dark);
-    color: var(--button-secondary-text-dark);
-    border-color: var(--accent-color-dark); /* Use accent for border */
-}
-body.dark-mode .project-type-button:not(:disabled):hover {
-    background-color: var(--accent-color-dark);
-    color: var(--button-primary-text-dark);
-    border-color: var(--accent-color-dark);
-}
-body.light-mode .project-type-button {
-    background-color: var(--button-secondary-bg-light);
-    color: var(--button-secondary-text-light);
-    border-color: var(--accent-color-light); /* Use accent for border */
-}
-body.light-mode .project-type-button:not(:disabled):hover {
-    background-color: var(--accent-color-light);
-    color: var(--button-primary-text-light);
-    border-color: var(--accent-color-light);
-}
-
-
-/* Knowledge Tab Specifics */
-#knowledgeListContainer {
-    max-height: 300px;
-    overflow-y: auto;
-    padding-top: 10px;
-}
-.knowledge-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 12px;
-    margin-bottom: 8px;
-    border-radius: 6px;
-    border: 1px solid;
-}
-body.dark-mode .knowledge-item { background-color: var(--input-bg-dark); border-color: var(--input-border-dark); }
-body.light-mode .knowledge-item { background-color: var(--input-bg-light); border-color: var(--input-border-light); }
-
-.knowledge-item-title {
-    flex-grow: 1;
-    font-size: 0.9em;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    margin-right: 10px;
-}
-.knowledge-item-actions { display: flex; align-items: center; gap: 10px; }
-.knowledge-item-actions .switch { margin-right: 5px; } /* Add some space before delete */
-.knowledge-item-actions .delete-knowledge-button {
-    background: none;
-    border: none;
-    color: var(--icon-color-dark); /* Default to dark, override for light */
-    cursor: pointer;
-    font-size: 1.1em;
-    padding: 2px;
-}
-body.light-mode .knowledge-item-actions .delete-knowledge-button { color: var(--icon-color-light); }
-.knowledge-item-actions .delete-knowledge-button:hover { color: #ff4d4d; }
-
-#addKnowledgeDocModal .standard-input, 
-#addKnowledgeDocModal .standard-textarea {
-    width: 100%; padding: 8px; border-radius: 6px; font-family: var(--font-family); font-size: 0.9em; border: 1px solid;
-}
-body.dark-mode #addKnowledgeDocModal .standard-input, 
-body.dark-mode #addKnowledgeDocModal .standard-textarea {
-    background-color: var(--input-bg-dark); color: var(--input-text-dark); border-color: var(--input-border-dark);
-}
-body.light-mode #addKnowledgeDocModal .standard-input, 
-body.light-mode #addKnowledgeDocModal .standard-textarea {
-    background-color: var(--input-bg-light); color: var(--input-text-light); border-color: var(--input-border-light);
-}
-
 
 a { text-decoration: none; }
 body.dark-mode a { color: var(--link-color-dark); }
@@ -648,7 +613,6 @@ body.dark-mode #selectElementsToggle.active { background-color: var(--accent-col
 body.light-mode #selectElementsToggle.active { background-color: var(--accent-color-light); color: var(--button-primary-text-light); }
 
 .hidden { display: none !important; }
-
 
 @media (max-width: 768px) {
     header, .secondary-header { flex-direction: column; align-items: stretch; gap: 8px; padding: 10px; }
