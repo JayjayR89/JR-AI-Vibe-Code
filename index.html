@@ -6,13 +6,13 @@
     <title>Vibe Code Canvas – AI UI Builder</title>
     <link rel="stylesheet" href="index.css">
     <script src="https://js.puter.com/v2/"></script>
-<script type="importmap">
-{
-  "imports": {
-    "@google/genai": "https://esm.sh/@google/genai@^1.1.0"
-  }
-}
-</script>
+    <script type="importmap">
+    {
+      "imports": {
+        "@google/genai": "https://esm.sh/@google/genai@^1.1.0"
+      }
+    }
+    </script>
 </head>
 <body>
     <header>
@@ -32,7 +32,9 @@
         </div>
         <div class="header-right">
             <button id="settingsButton" class="header-button icon-button" aria-label="Open Settings">
-                <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>
+                <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65A.488.488 0 0014 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zm-7.43 2.52c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/>
+                </svg>
                 Settings
             </button>
         </div>
@@ -42,18 +44,20 @@
         <div class="secondary-header-left">
             <input type="text" id="appProjectNameInput" class="app-project-name-input" value="Vibe Code Project" aria-label="App Project Name">
             <button id="newProjectButton" class="header-button icon-button">
-                <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                </svg>
                 New Project
             </button>
         </div>
         <div class="secondary-header-center">
-            <!-- QR and GitHub buttons removed -->
         </div>
         <div class="secondary-header-right">
-            <!-- Save State button removed -->
             <div class="dropdown">
                 <button id="downloadButton" class="header-button dropdown-toggle icon-button" aria-label="Download">
-                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                    </svg>
                     Download
                 </button>
                 <div class="dropdown-content">
@@ -69,7 +73,9 @@
             <div class="panel-header">
                 <h3>AI Tools</h3>
                 <button id="toggleAiToolsPanel" class="panel-header-button" aria-label="Collapse AI Tools Panel">
-                    <svg class="icon icon-toggle-panel" viewBox="0 0 24 24" fill="currentColor"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>
+                    <svg class="icon icon-toggle-panel" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/>
+                    </svg>
                 </button>
             </div>
             <div id="aiToolsContent">
@@ -78,8 +84,10 @@
                     <div id="aiToolsSection1Content">
                         <textarea id="generatePromptInput" rows="3" placeholder="e.g., a landing page hero section..."></textarea>
                         <div class="action-row">
-                             <button id="generateMicrophoneButton" class="microphone-button" aria-label="Use Microphone for Generate Prompt">
-                                <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg>
+                            <button id="generateMicrophoneButton" class="microphone-button" aria-label="Use Microphone for Generate Prompt">
+                                <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+                                </svg>
                             </button>
                             <button id="generateCodeButton">Generate Code ➔</button>
                         </div>
@@ -97,7 +105,9 @@
                     <textarea id="modifyPromptInput" rows="2" placeholder="e.g., Change the background color to lightblue..."></textarea>
                     <div class="action-row">
                         <button id="modifyMicrophoneButton" class="microphone-button" aria-label="Use Microphone for Modify Prompt">
-                           <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg>
+                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+                            </svg>
                         </button>
                         <button id="modifyCodeButton">Modify Code ➔</button>
                     </div>
@@ -109,13 +119,34 @@
                     <div id="elementEditorControls" class="hidden" style="margin-top: 10px;">
                         <h5>Editing: <span id="selectedElementIdentifier">N/A</span></h5>
                         <div class="control-grid">
-                            <div><label for="elementTextContent">Text Content:</label><input type="text" id="elementTextContent"></div>
-                            <div><label for="elementColor">Text Color:</label><input type="color" id="elementColor" value="#000000"></div>
-                            <div><label for="elementBgColor">Background Color:</label><input type="color" id="elementBgColor" value="#FFFFFF"></div>
-                            <div><label for="elementWidth">Width:</label><input type="text" id="elementWidth" placeholder="e.g., 100px or 50%"></div>
-                            <div><label for="elementHeight">Height:</label><input type="text" id="elementHeight" placeholder="e.g., 50px or auto"></div>
-                            <div><label for="elementPadding">Padding:</label><input type="text" id="elementPadding" placeholder="e.g., 10px"></div>
-                            <div><label for="elementMargin">Margin:</label><input type="text" id="elementMargin" placeholder="e.g., 10px"></div>
+                            <div>
+                                <label for="elementTextContent">Text Content:</label>
+                                <input type="text" id="elementTextContent">
+                            </div>
+                            <div>
+                                <label for="elementColor">Text Color:</label>
+                                <input type="color" id="elementColor" value="#000000">
+                            </div>
+                            <div>
+                                <label for="elementBgColor">Background Color:</label>
+                                <input type="color" id="elementBgColor" value="#FFFFFF">
+                            </div>
+                            <div>
+                                <label for="elementWidth">Width:</label>
+                                <input type="text" id="elementWidth" placeholder="e.g., 100px or 50%">
+                            </div>
+                            <div>
+                                <label for="elementHeight">Height:</label>
+                                <input type="text" id="elementHeight" placeholder="e.g., 50px or auto">
+                            </div>
+                            <div>
+                                <label for="elementPadding">Padding:</label>
+                                <input type="text" id="elementPadding" placeholder="e.g., 10px">
+                            </div>
+                            <div>
+                                <label for="elementMargin">Margin:</label>
+                                <input type="text" id="elementMargin" placeholder="e.g., 10px">
+                            </div>
                             <div>
                                 <label for="elementPosition">Position:</label>
                                 <select id="elementPosition">
@@ -137,7 +168,10 @@
                                     <option value="none">None</option>
                                 </select>
                             </div>
-                            <div><label for="elementBorder">Border:</label><input type="text" id="elementBorder" placeholder="e.g., 1px solid black"></div>
+                            <div>
+                                <label for="elementBorder">Border:</label>
+                                <input type="text" id="elementBorder" placeholder="e.g., 1px solid black">
+                            </div>
                         </div>
                         <p class="ai-edit-label">Or describe changes with AI:</p>
                         <textarea id="editElementPromptInput" rows="2" placeholder="e.g., make this button rounded with a blue border"></textarea>
@@ -151,38 +185,51 @@
                 <div class="ai-tool-section" id="codeCheckpointsSection">
                     <h4>Code Checkpoints</h4>
                     <button id="createCheckpointButton" class="checkpoint-button icon-button">
-                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                        </svg>
                         Create Checkpoint
                     </button>
                     <button id="viewRestoreCheckpointsButton" class="checkpoint-button icon-button">
-                         <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.25 2.52.77-1.28-3.52-2.09V8H12z"/></svg>
+                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
+                        </svg>
                         View & Restore Checkpoints
                     </button>
                     <p id="checkpointsStatus" class="checkpoints-status-text">No checkpoints created yet.</p>
                 </div>
             </div>
         </div>
+
         <div id="codeFilesPanel" class="panel">
             <div class="panel-header">
                 <h3 id="codePanelTitle">Generated Code</h3>
                 <button id="filesButton" class="panel-header-button icon-button" aria-label="Toggle Files View">
-                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L19.5 9H13z"/>
+                    </svg>
                     Files
                 </button>
             </div>
             <div id="fileExplorer" class="hidden">
                 <div class="file-explorer-toolbar">
                     <button id="createNewFileButton" class="panel-header-button icon-button">
-                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V9l-7-7zm4 18H7v-2h10v2zm0-4H7v-2h10v2zm-2-4V3.5L19.5 9H15z"/></svg>
+                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M13 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V9l-7-7zm4 18H7v-2h10v2zm0-4H7v-2h10v2zm-2-4V3.5L19.5 9H15z"/>
+                        </svg>
                         New File
                     </button>
                     <button id="createNewFolderButton" class="panel-header-button icon-button" disabled title="Folder creation coming soon">
-                         <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M10 4H4c-1.11 0-2 .89-2 2v12c0 1.1.89 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
+                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M10 4H4c-1.11 0-2 .89-2 2v12c0 1.1.89 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
+                        </svg>
                         New Folder
                     </button>
                     <input type="file" id="uploadFileInput" class="hidden" multiple>
                     <button id="uploadFileTriggerButton" class="panel-header-button icon-button">
-                         <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
+                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/>
+                        </svg>
                         Upload File(s)
                     </button>
                 </div>
@@ -192,16 +239,27 @@
             </div>
             <pre id="codeOutput"><code>No code generated yet. Enter a prompt to start.</code></pre>
         </div>
+
         <div id="previewAppPanel" class="panel">
             <div class="panel-header">
                 <h3>Live Preview</h3>
                 <div>
                     <button id="selectElementsToggle" class="panel-header-button">Select Elements: OFF</button>
+                    <button id="dragElementToggle" class="panel-header-button">Drag Elements: OFF</button>
+                    <button id="reloadPreviewButton" class="panel-header-button preview-icon-button" aria-label="Reload Preview">
+                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+                        </svg>
+                    </button>
                     <button id="popOutButton" class="panel-header-button preview-icon-button" aria-label="Pop-out Preview">
-                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
+                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>
+                        </svg>
                     </button>
                     <button id="fullscreenButton" class="panel-header-button preview-icon-button" aria-label="Fullscreen Preview">
-                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+                        </svg>
                     </button>
                 </div>
             </div>
@@ -209,12 +267,15 @@
         </div>
     </main>
 
+    <!-- Settings Modal -->
     <div id="settingsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="settingsModalTitle">Settings</h2>
                 <button id="closeSettingsModal" class="close-button" aria-label="Close Settings">
-                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    </svg>
                 </button>
             </div>
             <div class="tabs">
@@ -224,6 +285,7 @@
                 <button class="tab-button" data-tab="aboutSettingsTab">About</button>
             </div>
 
+            <!-- UI Settings Tab -->
             <div id="uiSettingsTab" class="tab-content active">
                 <h3>UI Settings</h3>
                 <div class="setting-item">
@@ -249,9 +311,11 @@
                 </div>
             </div>
 
+            <!-- Model Settings Tab -->
             <div id="modelSettingsTab" class="tab-content">
                 <h3>API & Model Selection</h3>
-                 <!-- Gemini API Section -->
+                
+                <!-- Gemini API Section -->
                 <div class="setting-group">
                     <h4>Gemini API Configuration</h4>
                     <div class="setting-item">
@@ -271,6 +335,7 @@
                         <p class="setting-description">Save a valid API key first to enable Gemini API</p>
                     </div>
                 </div>
+
                 <!-- Puter.com Models Section -->
                 <div class="setting-group">
                     <h4>Puter.com Models</h4>
@@ -279,6 +344,7 @@
                 </div>
             </div>
 
+            <!-- General Settings Tab -->
             <div id="generalSettingsTab" class="tab-content">
                 <h3>General Settings</h3>
                 <div class="setting-item">
@@ -297,80 +363,68 @@
                 </div>
             </div>
 
+            <!-- About Tab -->
             <div id="aboutSettingsTab" class="tab-content">
                 <h3>About Vibe Code Canvas</h3>
-                <p>
-                    Created by <a href="https://jayreddin.github.io" target="_blank" rel="noopener noreferrer">Jamie Reddin</a> using the <a href="https://puter.com" target="_blank" rel="noopener noreferrer">Puter.com</a> <a href="https://docs.puter.com" target="_blank" rel="noopener noreferrer">API</a> and Google Gemini API. || Version <span id="appVersion">1.0.5</span>
-                </p>
+                <p>Created by <a href="https://jayreddin.github.io" target="_blank" rel="noopener noreferrer">Jamie Reddin</a></p>
+                <p>Version: <span id="appVersion"></span></p>
                 <h4>Features:</h4>
                 <ul>
                     <li>AI-powered UI generation & modification</li>
                     <li>Real-time element editing (in-app & pop-out)</li>
                     <li>Live application preview & Pop-out</li>
-                    <li>Customizable interface and model selection (Puter/Gemini)</li>
-                    <li>Secure authentication via Puter</li>
-                    <li>Code Checkpoints (Manual & Automatic, with Restore)</li>
-                    <li>Tooltips</li>
-                    <li>Basic File Management (HTML, CSS, JS coming soon)</li>
+                    <li>Customizable interface and model selection</li>
+                    <li>Code Checkpoints</li>
+                    <li>File Management</li>
                 </ul>
             </div>
+
             <div class="modal-footer">
-                <button id="saveModelsButton" class="modal-action-button primary-confirm-button">Save Puter Models</button>
-                <button id="closeSettingsModalFooter" class="modal-action-button" aria-label="Close Settings">Close</button>
+                <button id="saveModelsButton" class="modal-action-button primary-confirm-button">Save Models</button>
+                <button id="closeSettingsModalFooter" class="modal-action-button">Close</button>
             </div>
         </div>
     </div>
 
+    <!-- Restore Checkpoints Modal -->
     <div id="restoreCheckpointsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="restoreCheckpointsModalTitle">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="restoreCheckpointsModalTitle">View & Restore Checkpoints</h2>
-                <button id="closeRestoreCheckpointsModal" class="close-button" aria-label="Close Restore Checkpoints Modal">
-                     <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                <button id="closeRestoreCheckpointsModal" class="close-button" aria-label="Close">
+                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    </svg>
                 </button>
             </div>
-            <div id="checkpointsListContainer" class="tab-content active" style="padding: 20px;">
-                <!-- Checkpoints will be listed here by JS -->
+            <div id="checkpointsListContainer" class="tab-content active">
+                <!-- Checkpoints will be listed here -->
                 <p id="noCheckpointsMessage">No checkpoints available to restore.</p>
             </div>
             <div class="modal-footer">
-                <button id="cancelRestoreCheckpointButton" class="modal-action-button">Cancel</button>
+                <button id="cancelRestoreCheckpointButton" class="modal-action-button">Close</button>
             </div>
         </div>
     </div>
 
+    <!-- Project Creation Modal -->
     <div id="confirmNewProjectModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="confirmNewProjectModalTitle">
         <div class="modal-content" style="max-width: 400px;">
             <div class="modal-header">
                 <h2 id="confirmNewProjectModalTitle">Start New Project?</h2>
-                <button id="closeConfirmNewProjectModal" class="close-button" aria-label="Close Confirmation">
-                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                <button id="closeConfirmNewProjectModal" class="close-button" aria-label="Close">
+                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    </svg>
                 </button>
             </div>
             <div class="tab-content active" style="padding: 20px;">
-                <p>Are you sure you want to start a new blank project? All current unsaved code will be cleared.</p>
-                <p style="font-size: 0.85em; opacity: 0.8;">(Checkpoints will remain available.)</p>
-            </div>
-            <div class="modal-footer" style="justify-content: space-between;">
-                <button id="confirmNewProjectCancelButton" class="modal-action-button">Cancel</button>
-                <button id="confirmNewProjectConfirmButton" class="modal-action-button primary-confirm-button">Confirm New Project</button>
-            </div>
-        </div>
-    </div>
-    
-    <div id="modelDetailsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modelDetailsModalTitle">
-        <div class="modal-content" style="max-width: 500px;">
-            <div class="modal-header">
-                <h2 id="modelDetailsModalTitle">Model Details</h2>
-                <button id="closeModelDetailsModal" class="close-button" aria-label="Close Model Details">
-                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-                </button>
-            </div>
-            <div class="tab-content active" style="padding: 20px; white-space: pre-wrap; word-wrap: break-word;">
-                <p id="modelDetailsContent">Details about the model will appear here.</p>
+                <p>Are you sure you want to start a new project? All current code will be cleared.</p>
+                <p class="hint-text">(Your checkpoints will remain available)</p>
             </div>
             <div class="modal-footer">
-                <button id="closeModelDetailsModalFooter" class="modal-action-button">Close</button>
+                <button id="confirmNewProjectCancelButton" class="modal-action-button">Cancel</button>
+                <button id="confirmNewProjectConfirmButton" class="modal-action-button primary-confirm-button">Create New Project</button>
             </div>
         </div>
     </div>
