@@ -1831,3 +1831,116 @@ body.light-mode .tab-button.active:focus-visible {
     .template-grid { grid-template-columns: 1fr; } /* Stack template buttons on small screens */
     .template-grid-button { height: auto; min-height: 100px; }
 }
+
+/* Add these new styles to your existing index.css file */
+
+/* Gemini API Key Input Group */
+.api-key-input-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 5px;
+}
+
+.api-key-input-group input[type="password"] {
+    flex: 1;
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    border: 1px solid;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+body.dark-mode .api-key-input-group input[type="password"] {
+    background-color: var(--input-bg-dark);
+    color: var(--input-text-dark);
+    border-color: var(--input-border-dark);
+}
+
+body.dark-mode .api-key-input-group input[type="password"]:focus {
+    border-color: var(--input-focus-border-dark);
+    box-shadow: 0 0 0 2px var(--input-focus-shadow-dark);
+}
+
+body.light-mode .api-key-input-group input[type="password"] {
+    background-color: var(--input-bg-light);
+    color: var(--input-text-light);
+    border-color: var(--input-border-light);
+}
+
+body.light-mode .api-key-input-group input[type="password"]:focus {
+    border-color: var(--input-focus-border-light);
+    box-shadow: 0 0 0 2px var(--input-focus-shadow-light);
+}
+
+.setting-group {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid;
+}
+
+body.dark-mode .setting-group {
+    border-color: var(--divider-color-dark);
+}
+
+body.light-mode .setting-group {
+    border-color: var(--divider-color-light);
+}
+
+.setting-group h4 {
+    margin: 0 0 10px;
+    font-size: 1em;
+    font-weight: 500;
+    color: var(--text-color-dark);
+}
+
+body.light-mode .setting-group h4 {
+    color: var(--text-color-light);
+}
+
+.api-key-input-group button {
+    white-space: nowrap;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    border: 1px solid;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.api-key-input-group button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+body.dark-mode .api-key-input-group button {
+    background-color: var(--button-secondary-bg-dark);
+    color: var(--button-secondary-text-dark);
+    border-color: var(--button-secondary-border-dark);
+}
+
+body.dark-mode .api-key-input-group button:hover:not(:disabled) {
+    background-color: var(--button-secondary-hover-bg-dark);
+}
+
+body.light-mode .api-key-input-group button {
+    background-color: var(--button-secondary-bg-light);
+    color: var(--button-secondary-text-light);
+    border-color: var(--button-secondary-border-light);
+}
+
+body.light-mode .api-key-input-group button:hover:not(:disabled) {
+    background-color: var(--button-secondary-hover-bg-light);
+}
+
+.api-key-input-group button.primary-confirm-button {
+    background-color: var(--button-primary-bg-dark);
+    color: var(--button-primary-text-dark);
+    border-color: var(--button-primary-border-dark);
+}
+
+body.light-mode .api-key-input-group button.primary-confirm-button {
+    background-color: var(--button-primary-bg-light);
+    color: var(--button-primary-text-light);
+    border-color: var(--button-primary-border-light);
+}
