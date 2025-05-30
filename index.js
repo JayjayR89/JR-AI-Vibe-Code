@@ -598,48 +598,48 @@ The separator to use between components. Defaults to \`-\`.
     }
 
     // --- Gemini API Initialization ---
-    function initializeGeminiClient() {
-      try {
-          const apiKey = process.env.API_KEY;
-          if (!apiKey) {
-              // This check is important. If the key isn't in env, Gemini won't work.
-              // The UI will rely on Puter.com's models in this case.
-              console.warn("Gemini API key (process.env.API_KEY) is not set. Gemini API will be unavailable.");
-              useGeminiAPI = false; // Ensure it's false if key is missing
-              updateApiUsageUI();
-              return false; // Indicate failure or unavailability
-          }
-          googleAi = new GoogleGenAI({ apiKey });
-          console.log("GoogleGenAI client initialized.");
-          return true;
-      } catch (error) {
-          console.error("Error initializing Gemini API client:", error);
-          alert(`Failed to initialize Gemini API: ${error.message || 'Unknown error'}. Please check your API key (if set) and network connection.`);
-          useGeminiAPI = false; // Ensure it's false on error
-          updateApiUsageUI();
-          return false;
-      }
+function initializeGeminiClient() {
+    try {
+        const apiKey = process.env.API_KEY;
+        if (!apiKey) {
+            console.warn("Gemini API key not set. Gemini API will be unavailable.");
+            useGeminiAPI = false;
+            updateApiUsageUI();
+            return false;
+        }
+        googleAi = new GoogleGenAI({ apiKey });
+        console.log("GoogleGenAI client initialized.");
+        return true;
+    } catch (error) {
+        console.error("Error initializing Gemini API client:", error);
+        useGeminiAPI = false;
+        updateApiUsageUI();
+        return false;
     }
+}
     
     // --- API Usage Management ---
-    function updateApiUsageUI() { 
-        if (useGeminiAPI && googleAi) { 
-            if(authContainer) authContainer.classList.add('hidden');
-            if(modelSelect) modelSelect.classList.add('hidden');
-            if(puterModelLabel) puterModelLabel.classList.add('hidden');
-            if(geminiModelLabelElement) {
-                geminiModelLabelElement.classList.remove('hidden');
-                geminiModelLabelElement.textContent = `Gemini API: ${GEMINI_TEXT_MODEL}`;
-            }
-        } else {
-            if(authContainer) authContainer.classList.remove('hidden'); 
-            if(modelSelect) modelSelect.classList.remove('hidden');
-            if(puterModelLabel) puterModelLabel.classList.remove('hidden');
-            if(geminiModelLabelElement) geminiModelLabelElement.classList.add('hidden');
+function updateApiUsageUI() { 
+    if (useGeminiAPI && googleAi) { 
+        if(authContainer) authContainer.classList.add('hidden');
+        if(modelSelect) modelSelect.classList.add('hidden');
+        if(puterModelLabel) puterModelLabel.classList.add('hidden');
+        if(geminiModelLabelElement) {
+            geminiModelLabelElement.classList.remove('hidden');
+            geminiModelLabelElement.textContent = `Gemini API: ${GEMINI_TEXT_MODEL}`;
         }
-         try { localStorage.setItem('useGeminiAPI', JSON.stringify(useGeminiAPI)); } 
-        catch (e) { console.warn("Could not save Gemini API preference to localStorage:", e); }
+    } else {
+        if(authContainer) authContainer.classList.remove('hidden');
+        if(modelSelect) modelSelect.classList.remove('hidden');
+        if(puterModelLabel) puterModelLabel.classList.remove('hidden');
+        if(geminiModelLabelElement) geminiModelLabelElement.classList.add('hidden');
     }
+    try { 
+        localStorage.setItem('useGeminiAPI', JSON.stringify(useGeminiAPI)); 
+    } catch (e) { 
+        console.warn("Could not save Gemini API preference:", e); 
+    }
+}
 
     // --- Speech Recognition ---
     function setupSpeechRecognition() {
