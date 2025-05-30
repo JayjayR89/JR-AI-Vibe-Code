@@ -2,6 +2,8 @@
   "name": "JR VIBE Code",
   "description": "An empty app",
   "requestFramePermissions": [
-    "microphone"
-  ]
+    "microphone",
+    "clipboard-read"
+  ],
+  "prompt": ""
 }
