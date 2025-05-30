@@ -1,563 +1,1833 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JR Vibe Code – AI UI Builder</title>
-    <link rel="stylesheet" href="index.css">
-    <script src="https://js.puter.com/v2/"></script>
-<script type="importmap">
-{
-  "imports": {
-    "@google/genai": "https://esm.sh/@google/genai@^1.1.0"
-  }
+/* CSS Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
-</script>
-</head>
-<body>
-    <header>
-        <div class="header-left">
-            <div id="authContainer" class="auth-container">
-                <button id="loginButton" class="header-button">Login</button>
-                <div id="userInfo" class="hidden">
-                    <span id="usernameContainer"></span>
-                    <button id="logoutButton" class="header-button">Logout</button>
-                </div>
-            </div>
-        </div>
-        <div class="header-center">
-            <span class="model-label puter-model-label">Model:</span>
-            <select id="modelSelect" class="puter-model-select" aria-label="Select AI Model"></select>
-            <span id="geminiModelLabel" class="model-label hidden">Gemini API Active</span>
-        </div>
-        <div class="header-right">
-            <button id="settingsButton" class="header-button icon-button" aria-label="Open Settings">
-                <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42.12.64l2 3.46c.12.22.39.3.61.22l2.49 1c.52.4 1.08.73 1.69.98l-.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49.42l-.38-2.65c.61.25 1.17-.59 1.69.98l2.49 1c.23.09.49 0 .61.22l2-3.46c.12-.22-.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>
-                Settings
-            </button>
-        </div>
-    </header>
 
-    <div class="secondary-header">
-        <div class="secondary-header-left">
-            <input type="text" id="appProjectNameInput" class="app-project-name-input" value="Vibe Code Project" aria-label="App Project Name">
-            <button id="newProjectButton" class="header-button icon-button" aria-label="Create New Project">
-                <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                New Project
-            </button>
-        </div>
-        <div class="secondary-header-center">
-             <div id="minimizedPanelRestoreArea" class="minimized-panel-restore-area">
-                <!-- Restore buttons will be injected here by JS -->
-            </div>
-        </div>
-        <div class="secondary-header-right">
-            <div class="dropdown">
-                <button id="downloadButton" class="header-button dropdown-toggle icon-button" aria-label="Download Options">
-                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-                    Download
-                </button>
-                <div class="dropdown-content">
-                    <a href="#" id="downloadActiveFile">Download Active File</a>
-                    <a href="#" id="downloadZip">Download Project as ZIP</a>
-                </div>
-            </div>
-        </div>
-    </div>
+html, body {
+    height: 100%;
+}
 
-    <main id="mainContainer">
-        <div id="aiToolsPanel" class="panel">
-            <div class="panel-header">
-                <h3>AI Tools</h3>
-                <div>
-                    <button id="aiHistoryButton" class="panel-header-button icon-button" aria-label="View AI Prompt History" title="View AI Prompt History">
-                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.25 2.52.77-1.28-3.52-2.09V8H12z"/></svg>
-                    </button>
-                    <button id="toggleAiToolsPanelButton" class="panel-header-button panel-content-toggle" aria-label="Minimize AI Tools Panel" aria-expanded="true" title="Minimize AI Tools Panel">
-                        <svg class="icon icon-toggle-panel" viewBox="0 0 24 24" fill="currentColor"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>
-                    </button>
-                </div>
-            </div>
-            <div id="aiToolsContent" class="panel-content">
-                <div id="aiToolsSection1" class="ai-tool-section">
-                    <h4 id="aiToolsSection1Title">1. Describe your UI for <span id="aiPromptFileTarget">index.html</span></h4>
-                    <div id="aiToolsSection1Content">
-                        <textarea id="generatePromptInput" rows="3" placeholder="e.g., a landing page hero section..."></textarea>
-                        <div class="action-row">
-                             <button id="generateMicrophoneButton" class="microphone-button" aria-label="Use Microphone for UI Description">
-                                <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg>
-                            </button>
-                            <button id="generateCodeButton">Generate Code ➔</button>
-                        </div>
-                        <p class="tip-text">Tip: Enter to submit, Shift+Enter for new line.</p>
-                    </div>
-                    <div id="generatedPromptDisplay" class="minimized-prompt-display hidden">
-                        <p><strong>Your UI description:</strong></p>
-                        <p id="displayedGeneratePrompt"></p>
-                        <button id="editInitialPromptButton">Edit Description</button>
-                    </div>
-                </div>
-
-                <div id="aiToolsSection2" class="ai-tool-section hidden">
-                    <h4>2. Modify app (<span id="aiModifyFileTarget">index.html</span>)</h4>
-                    <textarea id="modifyPromptInput" rows="2" placeholder="e.g., Change the background color to lightblue..."></textarea>
-                    <div class="action-row">
-                        <button id="modifyMicrophoneButton" class="microphone-button" aria-label="Use Microphone for Modify Request">
-                           <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg>
-                        </button>
-                        <button id="modifyCodeButton">Modify Code ➔</button>
-                    </div>
-                </div>
-
-                <div id="aiToolsSection3" class="ai-tool-section hidden">
-                    <h4>3. Edit Element (in index.html)</h4>
-                    <button id="selectElementButton">Select Element to Edit</button>
-                    <div id="elementEditorControls" class="hidden" style="margin-top: 10px;">
-                        <p class="editing-label">Editing: <span id="selectedElementIdentifier">N/A</span></p>
-                        
-                        <label for="elementTextContent">Text Content:</label>
-                        <textarea id="elementTextContent" rows="2" placeholder="Element text..."></textarea>
-
-                        <div class="control-grid two-columns">
-                            <div>
-                                <label for="elementColor">Text Color:</label>
-                                <input type="color" id="elementColor" value="#000000">
-                            </div>
-                            <div>
-                                <label for="elementBgColor">Background Color:</label>
-                                <input type="color" id="elementBgColor" value="#FFFFFF">
-                            </div>
-                        </div>
-                        <div class="control-grid two-columns">
-                            <div>
-                                <label for="elementWidth">Width:</label>
-                                <input type="text" id="elementWidth" placeholder="e.g., 100px or 50%">
-                            </div>
-                            <div>
-                                <label for="elementHeight">Height:</label>
-                                <input type="text" id="elementHeight" placeholder="e.g., 50px or auto">
-                            </div>
-                        </div>
-                        <div class="control-grid two-columns">
-                            <div>
-                                <label for="elementPadding">Padding:</label>
-                                <input type="text" id="elementPadding" placeholder="e.g., 10px">
-                            </div>
-                            <div>
-                                <label for="elementMargin">Margin:</label>
-                                <input type="text" id="elementMargin" placeholder="e.g., 10px">
-                            </div>
-                        </div>
-                        <div class="control-grid three-columns">
-                            <div>
-                                <label for="elementPosition">Position:</label>
-                                <select id="elementPosition">
-                                    <option value="">Default</option>
-                                    <option value="static">Static</option>
-                                    <option value="relative">Relative</option>
-                                    <option value="absolute">Absolute</option>
-                                    <option value="fixed">Fixed</option>
-                                    <option value="sticky">Sticky</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="elementDisplay">Display:</label>
-                                <select id="elementDisplay">
-                                    <option value="">Default</option>
-                                    <option value="block">Block</option>
-                                    <option value="inline">Inline</option>
-                                    <option value="inline-block">Inline-Block</option>
-                                    <option value="flex">Flex</option>
-                                    <option value="grid">Grid</option>
-                                    <option value="none">None</option>
-                                </select>
-                            </div>
-                             <div>
-                                <label for="elementTextAlign">Alignment:</label>
-                                <select id="elementTextAlign">
-                                    <option value="">Default</option>
-                                    <option value="left">Left</option>
-                                    <option value="center">Center</option>
-                                    <option value="right">Right</option>
-                                    <option value="justify">Justify</option>
-                                </select>
-                            </div>
-                        </div>
-                         <div class="control-grid two-columns">
-                            <div>
-                                <label for="elementBorder">Border:</label>
-                                <input type="text" id="elementBorder" placeholder="e.g., 1px solid black">
-                            </div>
-                            <div>
-                                <label for="elementBorderRadius">Corners (Radius):</label>
-                                <input type="text" id="elementBorderRadius" placeholder="e.g., 5px or 50%">
-                            </div>
-                        </div>
-                        
-                        <label for="elementCustomCSS">Custom CSS rules:</label>
-                        <textarea id="elementCustomCSS" rows="3" placeholder="e.g., box-shadow: 2px 2px 5px grey;&#10;transform: rotate(5deg);"></textarea>
-                        
-                        <p class="ai-edit-label">Or describe changes with AI:</p>
-                        <textarea id="editElementPromptInput" rows="2" placeholder="e.g., make this button rounded with a blue border"></textarea>
-                        
-                        <div class="element-editor-buttons">
-                            <button id="saveManualElementChangesButton">Apply Manual Edits</button>
-                            <button id="applyElementAIEditButton">Apply AI Edit</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="ai-tool-section" id="codeCheckpointsSection">
-                    <h4>Code Checkpoints</h4>
-                    <button id="createCheckpointButton" class="checkpoint-button icon-button" aria-label="Create a new checkpoint">
-                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                        Create Checkpoint
-                    </button>
-                    <button id="viewRestoreCheckpointsButton" class="checkpoint-button icon-button" aria-label="View and restore checkpoints">
-                         <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.25 2.52.77-1.28-3.52-2.09V8H12z"/></svg>
-                        View & Restore Checkpoints
-                    </button>
-                    <p id="checkpointsStatus" class="checkpoints-status-text">No checkpoints created yet.</p>
-                </div>
-            </div>
-        </div>
-        <div class="panel-resizer" id="resizerAiEditor"></div>
-        <div id="codeEditorPanel" class="panel">
-            <div class="panel-header">
-                <h3 id="codePanelTitle">Code Editor: No file selected</h3>
-                <div>
-                    <button id="filesButton" class="panel-header-button icon-button" aria-label="Toggle File Explorer" title="Toggle File Explorer">
-                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M10 4H2C.89 4 0 4.89 0 6v12c0 1.1.89 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
-                        Files
-                    </button>
-                    <button id="toggleCodeEditorPanelButton" class="panel-header-button panel-content-toggle" aria-label="Minimize Editor Panel" aria-expanded="true" title="Minimize Editor Panel">
-                         <svg class="icon icon-toggle-panel" viewBox="0 0 24 24" fill="currentColor"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>
-                    </button>
-                </div>
-            </div>
-            <div id="codeFilesContent" class="panel-content">
-                <div id="fileExplorer" class="hidden">
-                    <div class="file-explorer-toolbar">
-                        <button id="createNewFileButton" class="panel-header-button icon-button" aria-label="Create New File" title="Create New File">
-                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V9l-7-7zm4 18H7v-2h10v2zm0-4H7v-2h10v2zm-2-4V3.5L19.5 9H15z"/></svg>
-                            New File
-                        </button>
-                        <button id="createNewFolderButton" class="panel-header-button icon-button" aria-label="Create New Folder" title="Create New Folder">
-                             <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M10 4H4c-1.11 0-2 .89-2 2v12c0 1.1.89 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
-                            New Folder
-                        </button>
-                        <input type="file" id="uploadFileInput" class="hidden" multiple aria-hidden="true">
-                        <button id="uploadFileTriggerButton" class="panel-header-button icon-button" aria-label="Upload Files" title="Upload Files">
-                             <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
-                            Upload File(s)
-                        </button>
-                         <button id="deleteAllFilesButton" class="panel-header-button icon-button" aria-label="Delete All Project Files" title="Delete All Project Files">
-                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z"></path></svg>
-                            Delete All
-                        </button>
-                    </div>
-                    <div id="newFileFolderInputContainer" class="hidden" style="margin-bottom: 10px;">
-                        <input type="text" id="newFileFolderNameInput" placeholder="Enter name..." />
-                        <button id="saveNewFileFolderButton" class="panel-header-button">Save</button>
-                        <button id="cancelNewFileFolderButton" class="panel-header-button">Cancel</button>
-                    </div>
-                    <ul id="projectFileTree" class="file-tree-list" role="listbox" aria-label="Project Files">
-                        <!-- File items will be populated by JS -->
-                    </ul>
-                </div>
-                <pre id="codeOutput" role="textbox" aria-multiline="true" aria-label="Code editor content" contenteditable="true"><code>No code generated yet. Enter a prompt to start.</code></pre>
-            </div>
-        </div>
-        <div class="panel-resizer" id="resizerEditorPreview"></div>
-        <div id="previewPanel" class="panel">
-            <div class="panel-header">
-                <h3>Live Preview</h3>
-                <div>
-                    <button id="reloadPreviewButton" class="panel-header-button preview-icon-button" aria-label="Reload Preview" title="Reload Preview">
-                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
-                    </button>
-                    <button id="selectElementsToggle" class="panel-header-button preview-icon-button" aria-label="Toggle Element Selection Mode" title="Toggle Element Selection Mode">
-                         <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg> <!-- Placeholder, update icon -->
-                    </button>
-                    <button id="dragElementToggle" class="panel-header-button preview-icon-button" aria-label="Toggle Element Drag Mode" title="Toggle Element Drag Mode">
-                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20l-8-8m8 8l8-8m-8-8l-8 8m8-8l8 8"/></svg> <!-- Placeholder Drag Icon -->
-                    </button>
-                    <button id="popOutButton" class="panel-header-button preview-icon-button" aria-label="Pop-out Preview into New Window" title="Pop-out Preview">
-                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
-                    </button>
-                    <button id="fullscreenButton" class="panel-header-button preview-icon-button" aria-label="Toggle Fullscreen Preview" title="Toggle Fullscreen">
-                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
-                    </button>
-                    <button id="togglePreviewPanelButton" class="panel-header-button panel-content-toggle" aria-label="Minimize Preview Panel" aria-expanded="true" title="Minimize Preview Panel">
-                        <svg class="icon icon-toggle-panel" viewBox="0 0 24 24" fill="currentColor"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg>
-                    </button>
-                </div>
-            </div>
-            <iframe id="previewFrame" class="panel-content" title="App Preview" sandbox="allow-scripts allow-same-origin allow-modals allow-popups allow-forms"></iframe>
-        </div>
-    </main>
-
-    <div id="settingsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="settingsModalTitle">Settings</h2>
-                <div class="tabs" role="tablist">
-                    <button class="tab-button active" role="tab" aria-selected="true" aria-controls="uiSettingsTab" data-tab="uiSettingsTab">UI</button>
-                    <button class="tab-button" role="tab" aria-selected="false" aria-controls="modelSettingsTab" data-tab="modelSettingsTab">Models</button>
-                    <button class="tab-button" role="tab" aria-selected="false" aria-controls="docsSettingsTab" data-tab="docsSettingsTab">Docs</button>
-                    <button class="tab-button" role="tab" aria-selected="false" aria-controls="generalSettingsTab" data-tab="generalSettingsTab">General</button>
-                    <button class="tab-button" role="tab" aria-selected="false" aria-controls="aboutSettingsTab" data-tab="aboutSettingsTab">About</button>
-                </div>
-                <button id="closeSettingsModal" class="close-button" aria-label="Close Settings">
-                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-                </button>
-            </div>
-            
-            <div class="modal-body">
-                <div id="uiSettingsTab" class="tab-content active" role="tabpanel" aria-labelledby="uiSettingsTabButton">
-                    <h3>UI Settings</h3>
-                    <div class="setting-item">
-                        <label for="darkModeToggle">Dark Mode</label>
-                        <label class="switch">
-                            <input type="checkbox" id="darkModeToggle">
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-                    <div class="setting-item">
-                        <label for="tooltipsToggle">Enable Tooltips</label>
-                        <label class="switch">
-                            <input type="checkbox" id="tooltipsToggle">
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-                    <div class="setting-item">
-                        <label for="autoCreateCheckpointToggle">Auto-create checkpoints on prompt</label>
-                        <label class="switch">
-                            <input type="checkbox" id="autoCreateCheckpointToggle">
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-                </div>
-
-                <div id="modelSettingsTab" class="tab-content" role="tabpanel" aria-labelledby="modelSettingsTabButton">
-                    <h3>API & Model Selection</h3>
-                     <div class="setting-item">
-                        <label for="geminiApiToggle">Enable Gemini API</label>
-                        <label class="switch">
-                            <input type="checkbox" id="geminiApiToggle">
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-                    <p class="settings-group-label">Select Puter.com models (active if Gemini API is disabled):</p>
-                    <div id="modelListContainer" role="listbox" aria-label="Select Puter.com Models" aria-multiselectable="true"></div>
-                    <button id="saveModelsButton" class="modal-action-button">Save Puter Model Selection</button>
-                </div>
-                
-                <div id="docsSettingsTab" class="tab-content" role="tabpanel" aria-labelledby="docsSettingsTabButton">
-                    <h3>AI Context Documents</h3>
-                    <p class="settings-description">Manage documents to provide context/knowledge to the AI. Active documents will be used in prompts. Documents are stored in your Puter cloud storage.</p>
-                    <p id="aiDocsStorageAlert" class="settings-info-text error-text hidden" role="alert"></p>
-                    
-                    <div class="ai-docs-toolbar">
-                        <button id="uploadAiDocButton" class="modal-action-button icon-button" title="Upload .txt or .md files">
-                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
-                            Upload Docs
-                        </button>
-                        <input type="file" id="aiDocFileInput" class="hidden" multiple accept=".txt,.md,.text,text/plain,text/markdown">
-                        <button id="typeOrEditAiDocButton" class="modal-action-button icon-button" title="Type or Edit a Document">
-                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-                            Type New Doc
-                        </button>
-                    </div>
-
-                    <div id="typeAiDocFormContainer" class="hidden ai-doc-form" role="form" aria-labelledby="typeAiDocFormTitle">
-                        <h4 id="typeAiDocFormTitle">Type New Document</h4>
-                        <div>
-                            <label for="aiDocTitleInput">Document Title (e.g., my_api_notes.txt):</label>
-                            <input type="text" id="aiDocTitleInput" placeholder="Enter title...">
-                        </div>
-                        <div>
-                            <label for="aiDocContentInput">Document Content:</label>
-                            <div class="textarea-wrapper">
-                                <textarea id="aiDocContentInput" rows="6" placeholder="Paste or type document content..."></textarea>
-                                <button id="pasteAiDocContentButton" class="icon-button paste-button" aria-label="Paste content" title="Paste content from clipboard">
-                                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19 2h-4.18C14.4.84 13.3 0 12 0S9.6.84 9.18 2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm7 18H5V4h2v3h10V4h2v16z"/></svg>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="ai-doc-form-actions">
-                            <button id="saveTypedAiDocButton" class="modal-action-button primary">Save Document</button>
-                            <button id="cancelTypedAiDocButton" class="modal-action-button">Cancel</button>
-                        </div>
-                    </div>
-                    
-                    <p id="noAiDocsMessage" class="settings-info-text">No context documents uploaded yet.</p>
-                    <div id="aiDocsListContainer" class="ai-docs-list" role="listbox" aria-label="AI Context Documents">
-                        <!-- AI Docs will be listed here -->
-                    </div>
-                </div>
-
-                <div id="generalSettingsTab" class="tab-content" role="tabpanel" aria-labelledby="generalSettingsTabButton">
-                    <h3>General Settings</h3>
-                    <div class="setting-item">
-                        <label for="appMemoryToggle">Enable App Memory (Chat History)</label>
-                        <label class="switch">
-                            <input type="checkbox" id="appMemoryToggle" checked>
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-                    <div class="setting-item">
-                        <label for="fileContextToggle">Enable File Context (Experimental)</label>
-                        <label class="switch">
-                            <input type="checkbox" id="fileContextToggle">
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-                    <div class="setting-item">
-                        <label for="showWelcomeModalToggle">Show Welcome Modal on Startup</label>
-                        <label class="switch">
-                            <input type="checkbox" id="showWelcomeModalToggle" checked>
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-                </div>
-
-                <div id="aboutSettingsTab" class="tab-content" role="tabpanel" aria-labelledby="aboutSettingsTabButton">
-                    <h3>About JR Vibe Code</h3>
-                    <p>
-                        Created by <a href="https://jayreddin.github.io" target="_blank" rel="noopener noreferrer">Jamie Reddin</a> using the <a href="https://puter.com" target="_blank" rel="noopener noreferrer">Puter.com</a> <a href="https://docs.puter.com" target="_blank" rel="noopener noreferrer">API</a> and Google Gemini API. || Version <span id="appVersion">1.2.0</span>
-                    </p>
-                    <h4>Features:</h4>
-                    <ul id="featuresList">
-                        <li>AI-driven Development (HTML, CSS, JS)</li>
-                        <li>Live Preview & Pop-out Interactive Editor</li>
-                        <li>Multi-File Management (Create, Upload, Edit Tabs)</li>
-                        <li>Granular Element Control (Manual & AI)</li>
-                        <li>Flexible API & Model Choice (Puter/Gemini)</li>
-                        <li>Persistent Workspace (Files, Settings, Checkpoints)</li>
-                        <li>Code Checkpoints (Manual & Automatic Restore)</li>
-                        <li>Welcome Modal with Starter Templates (Blank, Basic Web, Puter App)</li>
-                        <li>Puter App template uses Puter.js docs as AI knowledge base</li>
-                        <li>AI Context Documents (via Settings > Docs) with Puter Cloud Storage</li>
-                    </ul>
-                </div>
-            </div>
-            <!-- Footer is removed, actions are within tabs or header -->
-        </div>
-    </div>
-
-    <div id="restoreCheckpointsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="restoreCheckpointsModalTitle">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="restoreCheckpointsModalTitle">View & Restore Checkpoints</h2>
-                <button id="closeRestoreCheckpointsModal" class="close-button" aria-label="Close Restore Checkpoints Modal">
-                     <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div id="checkpointsListContainer" class="tab-content active" role="listbox" aria-label="Available Checkpoints" style="padding: 20px;">
-                    <!-- Checkpoints will be listed here by JS -->
-                    <p id="noCheckpointsMessage" class="settings-info-text">No checkpoints available to restore.</p>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button id="cancelRestoreCheckpointButton" class="modal-action-button">Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="confirmNewProjectModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="confirmNewProjectModalTitle">
-        <div class="modal-content" style="max-width: 400px;">
-            <div class="modal-header">
-                <h2 id="confirmNewProjectModalTitle">Start New Project?</h2>
-                <button id="closeConfirmNewProjectModal" class="close-button" aria-label="Close Confirmation">
-                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="tab-content active" style="padding: 20px;">
-                    <p>This will clear your current workspace and start a new blank project. Are you sure?</p>
-                    <p class="settings-description" style="font-size: 0.85em;">(Your saved checkpoints will remain available.)</p>
-                </div>
-            </div>
-            <div class="modal-footer" style="justify-content: space-between;">
-                <button id="confirmNewProjectCancelButton" class="modal-action-button">Cancel</button>
-                <button id="confirmNewProjectConfirmButton" class="modal-action-button primary-confirm-button">Confirm New Project</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="welcomeModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="welcomeModalTitle">
-        <div class="modal-content" style="max-width: 600px;"> <!-- Increased max-width for new layout -->
-            <div class="modal-header welcome-modal-header">
-                <img id="welcomeModalLogo" src="Imgs/applogo.jpg" alt="App Logo" class="welcome-logo"> <!-- Add your app logo image -->
-                <h2 id="welcomeModalTitle">Welcome to JR Vibe Code!</h2>
-            </div>
-            <div class="modal-body">
-                <div id="welcomeAuthContainer" class="welcome-auth-container">
-                    <button id="welcomeLoginButton" class="modal-action-button primary">Login to Puter</button>
-                    <span id="welcomeUsernameDisplay" class="welcome-username hidden"></span>
-                </div>
-                
-                <div class="welcome-project-name-container">
-                    <label for="welcomeProjectNameInput">Vibe Code Project Name:</label>
-                    <input type="text" id="welcomeProjectNameInput" class="app-project-name-input" value="Vibe Code Project">
-                </div>
-
-                <p class="template-selection-title">Choose a template to start your project:</p>
-                <div id="templateSelectionContainer" class="template-grid">
-                    <button class="template-grid-button" data-template="blank" aria-label="Start with a blank project">
-                        <span class="template-icon">🚀</span>
-                        <span class="template-text">Blank Project</span>
-                    </button>
-                    <button class="template-grid-button" data-template="puter_app" aria-label="Start with a Puter.js app template">
-                        <img src="Imgs/putericon.png" alt="Puter Icon" class="template-image-icon"> <!-- Add Puter icon image -->
-                        <span class="template-text">Puter App</span>
-                    </button>
-                    <button class="template-grid-button" data-template="html_css_js" aria-label="Start with a basic HTML, CSS, and JavaScript setup">
-                         <span class="template-icon">🌐</span>
-                        <span class="template-text">Basic Web (HTML, CSS, JS)</span>
-                    </button>
-                    <button class="template-grid-button" data-template="community" aria-label="Explore community templates (coming soon)">
-                        <span class="template-icon">🌟</span>
-                        <span class="template-text">Community Templates</span>
-                    </button>
-                </div>
-                
-                <div class="welcome-modal-footer">
-                    <div class="setting-item" style="padding: 8px 0; border-bottom: none;">
-                        <label for="hideWelcomeModalToggle">Never show this welcome message again</label>
-                        <label class="switch">
-                            <input type="checkbox" id="hideWelcomeModalToggle">
-                            <span class="slider round"></span>
-                        </label>
-                    </div>
-                    <p id="welcomeVersionText" class="welcome-version-text"></p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="aiHistoryModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="aiHistoryModalTitle">
-        <div class="modal-content" style="max-width: 700px;">
-            <div class="modal-header">
-                <h2 id="aiHistoryModalTitle">AI Prompt History</h2>
-                <button id="closeAiHistoryModal" class="close-button" aria-label="Close AI History">
-                     <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p id="noAiHistoryMessage" class="settings-info-text">No AI interactions recorded yet.</p>
-                <ul id="aiHistoryList" class="ai-history-list">
-                    <!-- History items will be populated by JS -->
-                </ul>
-            </div>
-        </div>
-    </div>
+:root {
+    --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     
+    /* Dark Theme Variables - Updated "Dark Grey" Palette */
+    --bg-color-dark: #1A1A1A; /* Dark grey background */
+    --text-color-dark: #E5E5E5; /* Very light grey text */
+    --panel-bg-dark: #242424; /* Dark grey for panels */
+    --panel-border-dark: #333333;
+    --header-bg-dark: #202020; /* Slightly different dark grey for header */
+    --header-border-dark: #2D2D2D;
+    --header-button-bg-dark: transparent;
+    --header-button-hover-bg-dark: rgba(220, 220, 220, 0.1);
+    --header-button-text-dark: #CCCCCC; /* Lighter text for header buttons */
+    --header-button-border-dark: #404040;
+    --button-primary-bg-dark: #238636; /* Green for primary actions */
+    --button-primary-hover-bg-dark: #2EA043;
+    --button-primary-text-dark: #FFFFFF;
+    --button-primary-border-dark: #238636;
+    --button-secondary-bg-dark: #3A3A3A;
+    --button-secondary-hover-bg-dark: #4A4A4A;
+    --button-secondary-text-dark: #E0E0E0;
+    --button-secondary-border-dark: #505050;
+    --input-bg-dark: #1E1E1E; /* Darker grey for inputs */
+    --input-border-dark: #3C3C3C;
+    --input-text-dark: #E0E0E0;
+    --input-focus-border-dark: var(--accent-color-dark); /* Use accent for focus */
+    --input-focus-shadow-dark: rgba(var(--accent-color-rgb-dark), 0.4);
+    --placeholder-text-dark: #888888;
+    --accent-color-dark: #58A6FF; /* Blue accent, good contrast on grey */
+    --accent-color-rgb-dark: 88, 166, 255;
+    --icon-color-dark: #AAAAAA;
+    --link-color-dark: var(--accent-color-dark);
+    --modal-bg-dark: var(--panel-bg-dark);
+    --modal-shadow-dark: 0 8px 24px rgb(0, 0, 0);
+    --subtle-text-dark: #999999;
+    --divider-color-dark: var(--panel-border-dark);
+    --error-color-dark: #f85149;
+    --error-color-dark-rgb: 248, 81, 73;
+    --scrollbar-thumb-dark: #555;
+    --scrollbar-track-dark: #333;
+    --panel-resizer-bg-dark: #383838;
+    --panel-resizer-hover-bg-dark: var(--accent-color-dark);
 
-    <script type="module" src="index.js"></script>
-</body>
-</html>
-<link rel="stylesheet" href="index.css">
-<script src="index.tsx" type="module"></script>
+
+    /* Light Theme Variables */
+    --bg-color-light: #f0f2f5;
+    --text-color-light: #1f2328;
+    --panel-bg-light: #ffffff;
+    --panel-border-light: #d0d7de;
+    --header-bg-light: #f6f8fa;
+    --header-border-light: #d0d7de;
+    --header-button-bg-light: #f6f8fa;
+    --header-button-hover-bg-light: #e1e4e8;
+    --header-button-text-light: #57606a;
+    --header-button-border-light: rgba(27,31,36,0.15);
+    --button-primary-bg-light: #0969da;
+    --button-primary-hover-bg-light: #0362c5;
+    --button-primary-text-light: #ffffff;
+    --button-primary-border-light: #0969da;
+    --button-secondary-bg-light: #f6f8fa;
+    --button-secondary-hover-bg-light: #e1e4e8;
+    --button-secondary-text-light: #24292f;
+    --button-secondary-border-light: rgba(27,31,36,0.15);
+    --input-bg-light: #ffffff;
+    --input-border-light: #d0d7de;
+    --input-text-light: #24292f;
+    --input-focus-border-light: var(--accent-color-light); /* Use accent for focus */
+    --input-focus-shadow-light: rgba(var(--accent-color-rgb-light), 0.4);
+    --placeholder-text-light: #6e7681;
+    --accent-color-light: #0969da;
+    --accent-color-rgb-light: 9, 105, 218;
+    --icon-color-light: #57606a;
+    --link-color-light: #0969da;
+    --modal-bg-light: var(--panel-bg-light);
+    --modal-shadow-light: 0 8px 24px rgba(140,149,159,0.2);
+    --subtle-text-light: #57606a;
+    --divider-color-light: #d0d7de;
+    --error-color-light: #d73a49;
+    --error-color-light-rgb: 215, 58, 73;
+    --scrollbar-thumb-light: #aaa;
+    --scrollbar-track-light: #eee;
+    --panel-resizer-bg-light: #e0e0e0;
+    --panel-resizer-hover-bg-light: var(--accent-color-light);
+}
+
+body {
+    font-family: var(--font-family);
+    margin: 0;
+    background-color: rgba(30, 30, 30, 0.85);
+    color: #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+body.dark-mode { background-color: var(--bg-color-dark); color: var(--text-color-dark); }
+body.light-mode { background-color: var(--bg-color-light); color: var(--text-color-light); }
+
+/* --- Headers --- */
+header,
+.secondary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 12px;
+    flex-shrink: 0;
+    border-bottom: 1px solid;
+}
+body.dark-mode header,
+body.dark-mode .secondary-header { background-color: var(--header-bg-dark); border-bottom-color: var(--header-border-dark); }
+body.light-mode header,
+body.light-mode .secondary-header { background-color: var(--header-bg-light); border-bottom-color: var(--header-border-light); }
+
+.header-left, .header-center, .header-right,
+.secondary-header-left, .secondary-header-center, .secondary-header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.header-left { flex-grow: 0; flex-shrink: 0; min-width: 150px; }
+.header-center { flex-grow: 1; justify-content: center; }
+.header-right { flex-grow: 0; flex-shrink: 0; }
+
+.secondary-header-left { flex-grow: 1; }
+.secondary-header-center { flex-grow: 0; justify-content: center; min-width: 150px; }
+.secondary-header-right { flex-grow: 0; flex-shrink: 0; }
+
+.app-project-name-input {
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 1em;
+    font-weight: 600;
+    border: 1px solid; 
+    background-color: transparent;
+    max-width: 300px;
+    transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
+}
+body.dark-mode .app-project-name-input { 
+    color: var(--text-color-dark); 
+    border-color: var(--header-button-border-dark);
+}
+body.dark-mode .app-project-name-input:focus { 
+    border-color: var(--input-focus-border-dark); 
+    background-color: var(--input-bg-dark); 
+    box-shadow: 0 0 0 3px var(--input-focus-shadow-dark);
+}
+body.light-mode .app-project-name-input { 
+    color: var(--text-color-light); 
+    border-color: var(--header-button-border-light);
+}
+body.light-mode .app-project-name-input:focus { 
+    border-color: var(--input-focus-border-light); 
+    background-color: var(--input-bg-light); 
+    box-shadow: 0 0 0 3px var(--input-focus-shadow-light);
+}
+
+/* --- Buttons & Interactive Elements in Headers --- */
+.header-button {
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85em;
+    transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s; /* Added box-shadow transition */
+    border: 1px solid;
+    white-space: nowrap;
+    display: inline-flex; 
+    align-items: center; 
+    justify-content: center; 
+}
+body.dark-mode .header-button { background-color: var(--header-button-bg-dark); color: var(--header-button-text-dark); border-color: var(--header-button-border-dark); }
+body.dark-mode .header-button:hover { background-color: var(--header-button-hover-bg-dark); border-color: #555; } /* Consider using a variable for hover border */
+body.light-mode .header-button { background-color: var(--header-button-bg-light); color: var(--header-button-text-light); border-color: var(--header-button-border-light); }
+body.light-mode .header-button:hover { background-color: var(--header-button-hover-bg-light); }
+
+.auth-container #loginButton, 
+.auth-container #logoutButton { 
+    font-size: 0.85em; 
+    padding: 5px 8px; 
+}
+body.dark-mode .auth-container #loginButton { 
+    background-color: transparent; 
+    border-color: transparent; 
+    color: var(--link-color-dark); 
+}
+body.dark-mode .auth-container #loginButton:hover { 
+    background-color: var(--header-button-hover-bg-dark); 
+    text-decoration: underline; 
+}
+
+#userInfo { 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+    font-size: 0.85em; 
+}
+body.dark-mode #usernameContainer { color: var(--subtle-text-dark); }
+body.light-mode #usernameContainer { color: var(--subtle-text-light); }
+
+.model-label { 
+    font-size: 0.85em; 
+    margin-right: 5px; 
+}
+body.dark-mode .model-label { color: var(--subtle-text-dark); }
+body.light-mode .model-label { color: var(--subtle-text-light); }
+#geminiModelLabel { font-weight: 500; } 
+
+select#modelSelect { 
+    padding: 6px 10px;
+    border-radius: 6px; 
+    font-size: 0.85em; 
+    border: 1px solid; 
+    transition: border-color 0.2s, box-shadow 0.2s; 
+}
+body.dark-mode select#modelSelect { background-color: var(--input-bg-dark); color: var(--input-text-dark); border-color: var(--input-border-dark); }
+body.light-mode select#modelSelect { background-color: var(--input-bg-light); color: var(--input-text-light); border-color: var(--input-border-light); }
+/* Focus styles for select moved to general focus styles section */
+
+.dropdown { position: relative; display: inline-block; }
+.dropdown-toggle::after { content: ' ▼'; font-size: 0.7em; margin-left: 4px; }
+.dropdown-content { display: none; position: absolute; right: 0; min-width: 160px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 100; border-radius: 6px; padding: 5px 0; border: 1px solid; }
+.dropdown:hover .dropdown-content,
+.dropdown-toggle:focus-visible + .dropdown-content, /* Show on focus */
+.dropdown-content:hover { /* Keep open when hovering content */
+    display: block; 
+}
+.dropdown-content a { padding: 8px 12px; text-decoration: none; display: block; font-size: 0.9em; }
+body.dark-mode .dropdown-content { background-color: var(--panel-bg-dark); border-color: var(--panel-border-dark); }
+body.dark-mode .dropdown-content a { color: var(--text-color-dark); }
+body.dark-mode .dropdown-content a:hover,
+body.dark-mode .dropdown-content a:focus-visible { background-color: var(--header-button-hover-bg-dark); }
+body.light-mode .dropdown-content { background-color: var(--panel-bg-light); border-color: var(--panel-border-light); }
+body.light-mode .dropdown-content a { color: var(--text-color-light); }
+body.light-mode .dropdown-content a:hover,
+body.light-mode .dropdown-content a:focus-visible { background-color: var(--header-button-hover-bg-light); }
+
+.minimized-panel-restore-area {
+    display: flex;
+    gap: 5px;
+}
+.minimized-panel-restore-area .header-button {
+    padding: 4px 6px; /* Smaller padding for icon-only */
+}
+.minimized-panel-restore-area .icon {
+    margin-right: 0; /* No margin if it's an icon-only button */
+    width: 1.1em;
+    height: 1.1em;
+}
+
+
+/* --- Icons --- */
+.icon-button .icon {
+    width: 1em; 
+    height: 1em; 
+    margin-right: 0.4em;
+    vertical-align: text-bottom; 
+    fill: currentColor;
+}
+.panel-header-button .icon, 
+.preview-icon-button .icon, 
+.close-button .icon, 
+.microphone-button .icon,
+.panel-content-toggle .icon { 
+    margin-right: 0; /* For icon-only buttons */
+    width: 1.2em; 
+    height: 1.2em;
+    fill: currentColor;
+}
+/* If an icon-button has text AND an icon */
+.panel-header-button.icon-button > .icon,
+.preview-icon-button.icon-button > .icon { /* e.g. if reload gets text */
+    margin-right: 0.4em; 
+}
+.panel-header-button > .icon:only-child,
+.preview-icon-button > .icon:only-child { 
+    margin-right: 0; /* Ensure icon-only buttons have no margin */
+}
+
+.close-button .icon { width: 1em; height: 1em; }
+.microphone-button .icon { width: 1.1em; height: 1.1em; }
+
+
+/* --- Main Layout & Panels --- */
+main#mainContainer { display: flex; flex-grow: 1; overflow: hidden; }
+
+.panel { 
+    display: flex; 
+    flex-direction: column; 
+    overflow: hidden; 
+    border-right: 1px solid; 
+    transition: flex-basis 0.3s ease-in-out, opacity 0.3s ease-in-out; 
+    flex-shrink: 0; 
+}
+body.dark-mode .panel { background-color: var(--panel-bg-dark); border-color: var(--divider-color-dark); }
+body.light-mode .panel { background-color: var(--panel-bg-light); border-color: var(--divider-color-light); }
+.panel:last-child { border-right: none; }
+
+#aiToolsPanel { flex-basis: 300px; } 
+#codeEditorPanel { flex-basis: calc(50% - 150px - 5px); } 
+#previewPanel { flex-basis: calc(50% - 150px - 5px); } 
+
+.panel-content {
+    flex-grow: 1;
+    overflow: auto; /* scroll for content within panel */
+    display: flex; /* for codeOutputPre to grow */
+    flex-direction: column; /* for codeOutputPre to grow */
+}
+.panel-content.panel-content-minimized {
+    display: none;
+}
+#codeFilesContent { /* Specific container for file explorer and code output */
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow: hidden; /* Let children handle scroll */
+}
+#codeFilesContent.panel-content-minimized {
+    display: none;
+}
+
+
+.panel-resizer {
+    flex-basis: 5px;
+    flex-shrink: 0;
+    flex-grow: 0;
+    cursor: col-resize;
+    z-index: 10;
+    transition: background-color 0.2s;
+}
+body.dark-mode .panel-resizer { background-color: var(--panel-resizer-bg-dark); }
+body.light-mode .panel-resizer { background-color: var(--panel-resizer-bg-light); }
+body.dark-mode .panel-resizer:hover { background-color: var(--panel-resizer-hover-bg-dark); }
+body.light-mode .panel-resizer:hover { background-color: var(--panel-resizer-hover-bg-light); }
+.panel-resizer.panel-hidden { /* Hide resizer if associated panel is hidden */
+    display: none !important; 
+}
+
+.panel-header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 8px 12px; 
+    font-weight: 500; 
+    flex-shrink: 0; 
+    font-size: 0.9em; 
+    border-bottom: 1px solid; 
+}
+body.dark-mode .panel-header { background-color: rgba(0,0,0,0.1); border-color: var(--divider-color-dark); color: var(--subtle-text-dark); }
+body.light-mode .panel-header { background-color: rgba(0,0,0,0.03); border-color: var(--divider-color-light); color: var(--subtle-text-light); }
+.panel-header h3 { margin: 0; font-size: 1em; font-weight: 500; }
+
+.panel-header-button, .panel-content-toggle { 
+    background: none; 
+    border: none; 
+    cursor: pointer; 
+    padding: 4px; 
+    font-size: 0.9em; 
+    display: inline-flex; 
+    align-items: center; 
+    transition: background-color 0.2s, color 0.2s, transform 0.2s; 
+    border-radius: 4px; 
+}
+body.dark-mode .panel-header-button, body.dark-mode .panel-content-toggle { color: var(--icon-color-dark); }
+body.dark-mode .panel-header-button:hover, body.dark-mode .panel-content-toggle:hover { color: var(--text-color-dark); background-color: var(--header-button-hover-bg-dark); }
+body.light-mode .panel-header-button, body.light-mode .panel-content-toggle { color: var(--icon-color-light); }
+body.light-mode .panel-header-button:hover, body.light-mode .panel-content-toggle:hover { color: var(--text-color-light); background-color: var(--header-button-hover-bg-light); }
+
+.panel-header-button .icon-toggle-panel.icon-toggle-panel-minimized,
+.panel-content-toggle .icon-toggle-panel.icon-toggle-panel-minimized {
+    transform: rotate(180deg);
+}
+.panel-header > div { 
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+
+/* Preview Panel Icon Buttons (existing & new reload) */
+.preview-icon-button {
+    font-size: 1.1em; 
+    padding: 4px 6px; 
+    line-height: 1;
+    border: 1px solid transparent; /* Make border appear on hover/focus for cleaner look */
+    border-radius: 4px;
+    margin-left: 5px; /* Spacing between buttons */
+}
+body.dark-mode .preview-icon-button:hover, body.dark-mode .preview-icon-button:focus-visible { border-color: var(--header-button-border-dark); background-color: var(--header-button-hover-bg-dark); }
+body.light-mode .preview-icon-button:hover, body.light-mode .preview-icon-button:focus-visible { border-color: var(--header-button-border-light); background-color: var(--header-button-hover-bg-light); }
+
+
+/* --- AI Tools Panel Content --- */
+#aiToolsContent { 
+    padding: 15px; 
+    /* overflow-y: auto; Handled by .panel-content */
+    /* flex-grow: 1; Handled by .panel-content */
+    display: flex; 
+    flex-direction: column;
+}
+
+.ai-tool-section { margin-bottom: 20px; padding-bottom: 15px; }
+.ai-tool-section:not(:last-child) { border-bottom: 1px solid; }
+body.dark-mode .ai-tool-section:not(:last-child) { border-color: var(--divider-color-dark); }
+body.light-mode .ai-tool-section:not(:last-child) { border-color: var(--divider-color-light); }
+
+#codeCheckpointsSection { margin-top: auto; }
+
+.ai-tool-section h4 { margin: 0 0 10px; font-size: 1em; font-weight: 500; }
+body.dark-mode .ai-tool-section h4 { color: var(--subtle-text-dark); }
+body.light-mode .ai-tool-section h4 { color: var(--subtle-text-light); }
+
+#aiToolsSection1Title span, #aiModifyFileTarget { 
+    font-weight: normal; 
+}
+body.dark-mode #aiToolsSection1Title span, body.dark-mode #aiModifyFileTarget { color: var(--text-color-dark); }
+body.light-mode #aiToolsSection1Title span, body.light-mode #aiModifyFileTarget { color: var(--text-color-light); }
+
+#codeCheckpointsSection .checkpoint-button { 
+    display: flex; 
+    width: calc(100% - 20px); 
+    margin: 0 auto 8px; 
+    padding: 8px 12px; 
+    font-size: 0.9em; 
+    text-align: left; 
+    border: 1px solid; 
+    transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s; 
+    border-radius: 6px; 
+}
+body.dark-mode #codeCheckpointsSection .checkpoint-button { background-color: var(--button-secondary-bg-dark); color: var(--button-secondary-text-dark); border-color: var(--button-secondary-border-dark); }
+body.dark-mode #codeCheckpointsSection .checkpoint-button:hover { background-color: var(--button-secondary-hover-bg-dark); }
+body.light-mode #codeCheckpointsSection .checkpoint-button { background-color: var(--button-secondary-bg-light); color: var(--button-secondary-text-light); border-color: var(--button-secondary-border-light); }
+body.light-mode #codeCheckpointsSection .checkpoint-button:hover { background-color: var(--button-secondary-hover-bg-light); }
+
+
+.checkpoints-status-text { font-size: 0.8em; margin-top: 5px; text-align: center; }
+body.dark-mode .checkpoints-status-text { color: var(--subtle-text-dark); }
+body.light-mode .checkpoints-status-text { color: var(--subtle-text-light); }
+
+.action-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+.action-row > .microphone-button {
+    padding: 8px; 
+    flex-shrink: 0; 
+}
+.action-row > #generateCodeButton, 
+.action-row > #modifyCodeButton {
+    flex-grow: 1; 
+    margin-top: 0; 
+}
+
+textarea { 
+    width: 100%; 
+    padding: 8px; 
+    border-radius: 6px; 
+    resize: vertical; 
+    min-height: 60px; 
+    font-family: var(--font-family); 
+    font-size: 0.9em; 
+    border: 1px solid; 
+    transition: border-color 0.2s, box-shadow 0.2s;
+    margin-bottom: 10px; /* Added for spacing */
+}
+body.dark-mode textarea { background-color: var(--input-bg-dark); color: var(--input-text-dark); border-color: var(--input-border-dark); }
+body.dark-mode textarea::placeholder { color: var(--placeholder-text-dark); }
+body.light-mode textarea { background-color: var(--input-bg-light); color: var(--input-text-light); border-color: var(--input-border-light); }
+body.light-mode textarea::placeholder { color: var(--placeholder-text-light); }
+
+
+.microphone-button { 
+    background: none; 
+    border: 1px solid; 
+    cursor: pointer; 
+    font-size: 1.2em; 
+    padding: 8px; 
+    border-radius: 6px; 
+    display: inline-flex; 
+    align-items: center; 
+    justify-content: center; 
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s; 
+}
+body.dark-mode .microphone-button { color: var(--icon-color-dark); border-color: var(--input-border-dark); }
+body.dark-mode .microphone-button:hover { background-color: var(--header-button-hover-bg-dark); color: var(--text-color-dark); }
+body.light-mode .microphone-button { color: var(--icon-color-light); border-color: var(--input-border-light); }
+body.light-mode .microphone-button:hover { background-color: var(--header-button-hover-bg-light); color: var(--text-color-light); }
+.microphone-button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.microphone-button.recording .icon { animation: pulse-red 1.5s infinite; }
+body.dark-mode .microphone-button.recording .icon path, 
+body.dark-mode .microphone-button.recording .icon { 
+    fill: var(--error-color-dark);
+}
+body.light-mode .microphone-button.recording .icon path,
+body.light-mode .microphone-button.recording .icon {
+    fill: var(--error-color-light);
+}
+body.dark-mode .microphone-button.recording { box-shadow: 0 0 8px var(--error-color-dark); }
+body.light-mode .microphone-button.recording { box-shadow: 0 0 8px var(--error-color-light); }
+
+@keyframes pulse-red {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.05); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+textarea#editElementPromptInput,
+textarea#elementCustomCSS { width: 100%; margin-bottom: 10px; } 
+textarea#elementTextContent { margin-bottom: 10px; }
+
+#generateCodeButton, #modifyCodeButton, #applyElementAIEditButton, 
+#saveManualElementChangesButton, #selectElementButton, #editInitialPromptButton {
+    padding: 8px 12px; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    font-size: 0.9em; 
+    width: 100%; 
+    margin-top: 5px; 
+    border: 1px solid;
+    display: inline-flex; 
+    align-items: center; 
+    justify-content: center; 
+    transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s, opacity 0.2s;
+}
+body.dark-mode #generateCodeButton, body.dark-mode #modifyCodeButton, 
+body.dark-mode #applyElementAIEditButton, body.dark-mode #saveManualElementChangesButton {
+    background-color: var(--button-primary-bg-dark); 
+    color: var(--button-primary-text-dark); 
+    border-color: var(--button-primary-border-dark); 
+    font-weight: 500;
+}
+body.dark-mode #generateCodeButton:hover, body.dark-mode #modifyCodeButton:hover, 
+body.dark-mode #applyElementAIEditButton:hover, body.dark-mode #saveManualElementChangesButton:hover {
+    background-color: var(--button-primary-hover-bg-dark);
+}
+body.dark-mode #selectElementButton, body.dark-mode #editInitialPromptButton {
+    background-color: var(--button-secondary-bg-dark); 
+    color: var(--button-secondary-text-dark); 
+    border-color: var(--button-secondary-border-dark);
+}
+body.dark-mode #selectElementButton:hover, body.dark-mode #editInitialPromptButton:hover { background-color: var(--button-secondary-hover-bg-dark); }
+body.dark-mode #selectElementButton.active-selection { 
+    background-color: var(--accent-color-dark); 
+    color: var(--button-primary-text-dark); 
+    border-color: var(--accent-color-dark); 
+    box-shadow: 0 0 8px rgba(var(--accent-color-rgb-dark), 0.5);
+}
+body.light-mode #generateCodeButton, body.light-mode #modifyCodeButton, 
+body.light-mode #applyElementAIEditButton, body.light-mode #saveManualElementChangesButton {
+    background-color: var(--button-primary-bg-light); 
+    color: var(--button-primary-text-light); 
+    border-color: var(--button-primary-border-light); 
+    font-weight: 500;
+}
+body.light-mode #generateCodeButton:hover, body.light-mode #modifyCodeButton:hover, 
+body.light-mode #applyElementAIEditButton:hover, body.light-mode #saveManualElementChangesButton:hover {
+    background-color: var(--button-primary-hover-bg-light);
+}
+body.light-mode #selectElementButton, body.light-mode #editInitialPromptButton {
+    background-color: var(--button-secondary-bg-light); 
+    color: var(--button-secondary-text-light); 
+    border-color: var(--button-secondary-border-light);
+}
+body.light-mode #selectElementButton:hover, body.light-mode #editInitialPromptButton:hover { background-color: var(--button-secondary-hover-bg-light); }
+body.light-mode #selectElementButton.active-selection { 
+    background-color: var(--accent-color-light); 
+    color: var(--button-primary-text-light); 
+    border-color: var(--accent-color-light); 
+    box-shadow: 0 0 8px rgba(var(--accent-color-rgb-light), 0.5);
+}
+
+
+.tip-text { font-size: 0.8em; margin-top: 8px; }
+body.dark-mode .tip-text { color: var(--subtle-text-dark); }
+body.light-mode .tip-text { color: var(--subtle-text-light); }
+
+.minimized-prompt-display { padding: 10px; border-radius: 6px; font-size: 0.9em; border: 1px solid; }
+body.dark-mode .minimized-prompt-display { background-color: rgba(255,255,255,0.05); border-color: var(--input-border-dark); }
+body.dark-mode .minimized-prompt-display p { margin: 5px 0; color: var(--text-color-dark); }
+body.dark-mode .minimized-prompt-display strong { color: var(--subtle-text-dark); }
+body.light-mode .minimized-prompt-display { background-color: rgba(0,0,0,0.03); border-color: var(--input-border-light); }
+body.light-mode .minimized-prompt-display p { margin: 5px 0; color: var(--text-color-light); }
+body.light-mode .minimized-prompt-display strong { color: var(--subtle-text-light); }
+
+
+/* Element Editor Styles */
+#elementEditorControls .editing-label { margin-bottom: 10px; font-weight: 500; }
+#elementEditorControls label { display: block; font-size: 0.85em; margin-bottom: 3px; font-weight: 500; }
+body.dark-mode #elementEditorControls label { color: var(--subtle-text-dark); }
+body.light-mode #elementEditorControls label { color: var(--subtle-text-light); }
+
+#elementEditorControls .control-grid { 
+    display: grid; 
+    gap: 10px 15px; /* row-gap column-gap */
+    margin-bottom: 10px; 
+}
+#elementEditorControls .control-grid.two-columns { grid-template-columns: 1fr 1fr; }
+#elementEditorControls .control-grid.three-columns { grid-template-columns: 1fr 1fr 1fr; }
+
+#elementEditorControls .control-grid div { display: flex; flex-direction: column; } 
+#elementEditorControls .control-grid input[type="text"], 
+#elementEditorControls .control-grid input[type="color"], 
+#elementEditorControls .control-grid select,
+#elementEditorControls textarea {
+    width: 100%; 
+    padding: 8px;
+    border-radius: 4px; 
+    font-size: 0.9em;
+    border: 1px solid;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+#elementEditorControls .control-grid input[type="color"] { 
+    height: 38px; /* Match padding of text inputs */
+    padding: 4px; /* Adjust padding for color input */
+} 
+
+body.dark-mode #elementEditorControls .control-grid input, 
+body.dark-mode #elementEditorControls .control-grid select,
+body.dark-mode #elementEditorControls textarea {
+    background-color: var(--input-bg-dark); color: var(--input-text-dark); border-color: var(--input-border-dark);
+}
+body.light-mode #elementEditorControls .control-grid input, 
+body.light-mode #elementEditorControls .control-grid select,
+body.light-mode #elementEditorControls textarea { 
+    background-color: var(--input-bg-light); color: var(--input-text-light); border-color: var(--input-border-light);
+}
+
+.ai-edit-label { font-size: 0.85em; margin: 15px 0 5px; font-weight: 500; }
+body.dark-mode .ai-edit-label { color: var(--subtle-text-dark); }
+body.light-mode .ai-edit-label { color: var(--subtle-text-light); }
+
+.element-editor-buttons { display: flex; gap: 10px; margin-top: 15px; }
+.element-editor-buttons button { flex-grow: 1; }
+
+
+/* --- File Explorer --- */
+#fileExplorer {
+    padding: 10px;
+    overflow-y: auto;
+    display: flex; 
+    flex-direction: column;
+    max-height: 350px; 
+    min-height: 150px; 
+    flex-shrink: 0; 
+    border-bottom: 1px solid;
+}
+body.dark-mode #fileExplorer { border-bottom-color: var(--divider-color-dark); }
+body.light-mode #fileExplorer { border-bottom-color: var(--divider-color-light); }
+
+#codeEditorPanel.explorer-hidden #fileExplorer { display: none; } 
+#codeEditorPanel.explorer-visible #fileExplorer { display: flex; } 
+
+
+.file-explorer-toolbar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid;
+    flex-shrink: 0; 
+    flex-wrap: wrap; 
+}
+body.dark-mode .file-explorer-toolbar { border-color: var(--divider-color-dark); }
+body.light-mode .file-explorer-toolbar { border-color: var(--divider-color-light); }
+
+.file-explorer-toolbar .panel-header-button { 
+    padding: 6px 10px;
+    font-size: 0.85em;
+    border: 1px solid;
+    border-radius: 4px; 
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+    display: inline-flex;
+    align-items: center;
+}
+.file-explorer-toolbar .panel-header-button .icon { 
+    width: 1em;
+    height: 1em;
+    margin-right: 0.4em;
+    fill: currentColor;
+}
+.file-explorer-toolbar .panel-header-button > .icon:only-child { margin-right: 0; }
+
+body.dark-mode .file-explorer-toolbar .panel-header-button { border-color: var(--header-button-border-dark); }
+body.dark-mode .file-explorer-toolbar .panel-header-button:hover { background-color: var(--header-button-hover-bg-dark); } 
+body.light-mode .file-explorer-toolbar .panel-header-button { border-color: var(--header-button-border-light); }
+body.light-mode .file-explorer-toolbar .panel-header-button:hover { background-color: var(--header-button-hover-bg-light); } 
+
+
+#deleteAllFilesButton .icon {
+    color: var(--error-color-dark); 
+}
+body.light-mode #deleteAllFilesButton .icon {
+    color: var(--error-color-light);
+}
+
+
+#newFileFolderInputContainer { display: flex; gap: 5px; align-items: center; margin-bottom: 10px; }
+#newFileFolderInputContainer input[type="text"] {
+    flex-grow: 1;
+    padding: 6px 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    border: 1px solid;
+}
+body.dark-mode #newFileFolderInputContainer input[type="text"] { background-color: var(--input-bg-dark); color: var(--input-text-dark); border-color: var(--input-border-dark); }
+body.light-mode #newFileFolderInputContainer input[type="text"] { background-color: var(--input-bg-light); color: var(--input-text-light); border-color: var(--input-border-light); }
+body.dark-mode #newFileFolderInputContainer input[type="text"]:focus { border-color: var(--input-focus-border-dark); box-shadow: 0 0 0 2px var(--input-focus-shadow-dark); }
+body.light-mode #newFileFolderInputContainer input[type="text"]:focus { border-color: var(--input-focus-border-light); box-shadow: 0 0 0 2px var(--input-focus-shadow-light); }
+
+#newFileFolderInputContainer button {
+    padding: 6px 10px;
+    font-size: 0.85em;
+}
+
+
+.file-tree-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+.file-tree-list li {
+    padding: 5px 8px; 
+    cursor: pointer;
+    border-radius: 4px;
+    margin-bottom: 1px; 
+    font-size: 0.9em;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.2s, color 0.2s;
+    word-break: break-all;
+    position: relative; 
+}
+.file-tree-list li .file-name-wrapper {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    min-width: 0; 
+    margin-right: 24px; 
+}
+.file-tree-list li .file-name-wrapper span:last-child { 
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+.file-tree-list li .icon {
+    margin-right: 6px; 
+    width: 1em;
+    height: 1em;
+    fill: currentColor;
+    flex-shrink: 0;
+}
+.file-tree-list li .folder-toggle-icon {
+    margin-right: 4px;
+    width: 0.8em;
+    height: 0.8em;
+    transition: transform 0.2s;
+}
+.file-tree-list li .folder-toggle-icon.expanded {
+    transform: rotate(90deg);
+}
+
+.file-tree-list li .delete-file-button {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    font-size: 1.2em; 
+    padding: 2px 4px;
+    border-radius: 3px;
+    line-height: 1;
+    opacity: 0; /* Hidden by default, shown on hover */
+    transition: opacity 0.2s, background-color 0.2s, color 0.2s;
+    visibility: hidden;
+}
+.file-tree-list li:hover .delete-file-button,
+.file-tree-list li .delete-file-button:focus-visible {
+    opacity: 0.6; /* Default opacity when visible */
+    visibility: visible;
+}
+.file-tree-list li .delete-file-button:hover,
+.file-tree-list li .delete-file-button:focus-visible {
+    opacity: 1; /* Full opacity on its own hover/focus */
+}
+body.dark-mode .file-tree-list li .delete-file-button:hover,
+body.dark-mode .file-tree-list li .delete-file-button:focus-visible {
+    background-color: rgba(255,255,255,0.1); 
+    color: var(--error-color-dark);
+}
+body.light-mode .file-tree-list li .delete-file-button:hover,
+body.light-mode .file-tree-list li .delete-file-button:focus-visible {
+    background-color: rgba(0,0,0,0.05); 
+    color: var(--error-color-light);
+}
+
+
+body.dark-mode .file-tree-list li:hover { background-color: var(--header-button-hover-bg-dark); }
+body.dark-mode .file-tree-list li.active-file { background-color: var(--accent-color-dark); color: var(--button-primary-text-dark); font-weight: 500; }
+body.dark-mode .file-tree-list li.active-file .icon { fill: var(--button-primary-text-dark); }
+body.dark-mode .file-tree-list li.active-file .delete-file-button { color: var(--button-primary-text-dark); opacity: 0.7; }
+body.dark-mode .file-tree-list li.active-file .delete-file-button:hover { color: var(--error-color-dark); background-color: rgba(0,0,0,0.2); opacity: 1;}
+
+
+body.light-mode .file-tree-list li:hover { background-color: var(--header-button-hover-bg-light); }
+body.light-mode .file-tree-list li.active-file { background-color: var(--accent-color-light); color: var(--button-primary-text-light); font-weight: 500; }
+body.light-mode .file-tree-list li.active-file .icon { fill: var(--button-primary-text-light); }
+body.light-mode .file-tree-list li.active-file .delete-file-button { color: var(--button-primary-text-light); opacity: 0.7; }
+body.light-mode .file-tree-list li.active-file .delete-file-button:hover { color: var(--error-color-light); background-color: rgba(255,255,255,0.2); opacity: 1;}
+
+
+.file-tree-list li.folder-item > .file-name-wrapper { font-weight: 500; } 
+
+body.dark-mode .file-tree-list li.folder-item { color: var(--subtle-text-dark); }
+body.light-mode .file-tree-list li.folder-item { color: var(--subtle-text-light); }
+body.dark-mode .file-tree-list li.folder-item.active-file { color: var(--button-primary-text-dark); } 
+body.light-mode .file-tree-list li.folder-item.active-file { color: var(--button-primary-text-light); }
+
+.file-tree-list ul { 
+    list-style: none;
+    padding-left: 20px; 
+    margin: 0;
+}
+.file-tree-list li.drag-over-folder {
+    outline: 2px dashed;
+}
+body.dark-mode .file-tree-list li.drag-over-folder { outline-color: var(--accent-color-dark); background-color: rgba(var(--accent-color-rgb-dark), 0.1); }
+body.light-mode .file-tree-list li.drag-over-folder { outline-color: var(--accent-color-light); background-color: rgba(var(--accent-color-rgb-light), 0.1); }
+
+
+/* --- Code Editor & Preview --- */
+#codeOutput { 
+    flex-grow: 1; 
+    overflow: auto; 
+    padding: 15px; 
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace; 
+    font-size: 0.85em; 
+    line-height: 1.5; 
+    white-space: pre-wrap; 
+    word-wrap: break-word; 
+    outline: none; /* Remove default contenteditable outline */
+}
+#codeOutput:focus-visible {
+    box-shadow: inset 0 0 0 2px var(--input-focus-border-light); /* Example focus style */
+}
+body.dark-mode #codeOutput:focus-visible {
+    box-shadow: inset 0 0 0 2px var(--input-focus-border-dark);
+}
+body.dark-mode #codeOutput { color: var(--input-text-dark); } 
+body.light-mode #codeOutput { color: var(--input-text-light); }
+
+#previewFrame { 
+    flex-grow: 1; 
+    border: none; 
+    width: 100%; 
+    height: 100%; 
+}
+body.dark-mode #previewFrame { background-color: var(--bg-color-dark); }
+body.light-mode #previewFrame { background-color: var(--bg-color-light); } 
+
+
+.preview-element-hover-highlight {
+    outline: 2px dashed var(--accent-color-dark) !important;
+    cursor: pointer !important;
+    box-shadow: 0 0 8px rgba(var(--accent-color-rgb-dark), 0.5) !important;
+    background-color: rgba(var(--accent-color-rgb-dark), 0.1) !important; 
+}
+.preview-element-selected-highlight {
+    outline: 2px solid var(--accent-color-dark) !important;
+    box-shadow: 0 0 0 3px rgba(var(--accent-color-rgb-dark), 0.7), inset 0 0 5px rgba(var(--accent-color-rgb-dark), 0.3) !important;
+    background-color: rgba(var(--accent-color-rgb-dark), 0.15) !important; 
+}
+body.light-mode .preview-element-hover-highlight {
+    outline-color: var(--accent-color-light) !important;
+    box-shadow: 0 0 8px rgba(var(--accent-color-rgb-light), 0.5) !important;
+    background-color: rgba(var(--accent-color-rgb-light), 0.1) !important;
+}
+body.light-mode .preview-element-selected-highlight {
+    outline-color: var(--accent-color-light) !important;
+    box-shadow: 0 0 0 3px rgba(var(--accent-color-rgb-light), 0.7), inset 0 0 5px rgba(var(--accent-color-rgb-light), 0.3) !important;
+    background-color: rgba(var(--accent-color-rgb-light), 0.15) !important;
+}
+
+.preview-element-draggable {
+    cursor: grab !important;
+    opacity: 0.7;
+    border: 2px dashed var(--accent-color-dark) !important;
+}
+.preview-element-draggable:active {
+    cursor: grabbing !important;
+}
+.drop-target-indicator {
+    height: 3px;
+    background-color: var(--accent-color-dark);
+    margin: 1px 0;
+    box-shadow: 0 0 5px var(--accent-color-dark);
+}
+body.light-mode .preview-element-draggable {
+    border-color: var(--accent-color-light) !important;
+}
+body.light-mode .drop-target-indicator {
+    background-color: var(--accent-color-light);
+    box-shadow: 0 0 5px var(--accent-color-light);
+}
+
+
+/* --- Modals --- */
+.modal { 
+    position: fixed; 
+    z-index: 1000; 
+    left: 0; top: 0; 
+    width: 100%; height: 100%; 
+    background-color: rgba(0,0,0,0.6); 
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+}
+.modal:not(.hidden) {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease, visibility 0s linear 0s;
+}
+
+.modal-content { 
+    border-radius: 8px; 
+    width: 90%; 
+    max-width: 650px; 
+    max-height: 90vh; 
+    display: flex; 
+    flex-direction: column; 
+    border: 1px solid; 
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+}
+.modal:not(.hidden) .modal-content {
+    transform: scale(1);
+}
+
+body.dark-mode .modal-content { background-color: var(--modal-bg-dark); box-shadow: var(--modal-shadow-dark); border-color: var(--panel-border-dark); }
+body.light-mode .modal-content { background-color: var(--modal-bg-light); box-shadow: var(--modal-shadow-light); border-color: var(--panel-border-light); }
+
+.modal-header { 
+    padding: 0 0 0 20px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    border-bottom: 1px solid; 
+    flex-shrink: 0; 
+}
+body.dark-mode .modal-header { border-color: var(--divider-color-dark); }
+body.light-mode .modal-header { border-color: var(--divider-color-light); }
+
+.modal-header h2 { 
+    margin: 0; 
+    font-size: 1.1em; 
+    padding: 15px 0; 
+    flex-shrink: 0; 
+    margin-right: auto; 
+}
+.modal-header .tabs {
+    flex-grow: 1; 
+    display: flex;
+    justify-content: flex-start; 
+    margin-left: 20px; 
+    border-bottom: none; 
+}
+.modal-header .close-button { margin-left: 15px; padding: 15px; } 
+
+.close-button { 
+    background: none; 
+    border: none; 
+    font-size: 1.2em; 
+    cursor: pointer; 
+    line-height: 1; 
+    padding: 4px; 
+    transition: background-color 0.2s, color 0.2s; 
+    border-radius: 4px;
+}
+body.dark-mode .close-button { color: var(--icon-color-dark); }
+body.dark-mode .close-button:hover, 
+body.dark-mode .close-button:focus-visible { color: var(--text-color-dark); background-color: var(--header-button-hover-bg-dark); }
+body.light-mode .close-button { color: var(--icon-color-light); }
+body.light-mode .close-button:hover,
+body.light-mode .close-button:focus-visible { color: var(--text-color-light); background-color: var(--header-button-hover-bg-light); }
+
+.tab-button { 
+    padding: 12px 15px; 
+    cursor: pointer; 
+    border: none; 
+    background: none; 
+    font-size: 0.9em; 
+    border-bottom: 3px solid transparent; 
+    margin-bottom: -1px; 
+    transition: color 0.2s, border-color 0.2s, background-color 0.2s; 
+    border-radius: 4px 4px 0 0; 
+}
+body.dark-mode .tab-button { color: var(--subtle-text-dark); }
+body.dark-mode .tab-button.active { color: var(--accent-color-dark); border-bottom-color: var(--accent-color-dark); font-weight: 500; background-color: rgba(var(--accent-color-rgb-dark), 0.05);}
+body.dark-mode .tab-button:hover:not(.active),
+body.dark-mode .tab-button:focus-visible:not(.active) { color: var(--text-color-dark); background-color: var(--header-button-hover-bg-dark); }
+body.light-mode .tab-button { color: var(--subtle-text-light); }
+body.light-mode .tab-button.active { color: var(--accent-color-light); border-bottom-color: var(--accent-color-light); font-weight: 500; background-color: rgba(var(--accent-color-rgb-light), 0.05); }
+body.light-mode .tab-button:hover:not(.active),
+body.light-mode .tab-button:focus-visible:not(.active) { color: var(--text-color-light); background-color: var(--header-button-hover-bg-light); }
+
+.modal-body {
+    overflow-y: auto; 
+    flex-grow: 1;
+    padding: 20px;
+}
+.tab-content { display: none; /* padding: 20px; - moved to modal-body */ }
+.tab-content.active { display: block; }
+.tab-content h3 { margin-top: 0; margin-bottom: 15px; font-size: 1.1em; }
+.settings-description { font-size: 0.9em; line-height: 1.5; margin-bottom: 15px; }
+body.dark-mode .settings-description { color: var(--subtle-text-dark); }
+body.light-mode .settings-description { color: var(--subtle-text-light); }
+.tab-content ul { padding-left: 20px; font-size: 0.9em; }
+.settings-group-label { font-size: 0.9em; margin-top: 15px; margin-bottom: 8px; font-weight: 500; }
+body.dark-mode .settings-group-label { color: var(--subtle-text-dark); }
+body.light-mode .settings-group-label { color: var(--subtle-text-light); }
+.settings-info-text { font-size: 0.9em; margin-top: 10px; }
+body.dark-mode .settings-info-text { color: var(--subtle-text-dark); }
+body.light-mode .settings-info-text { color: var(--subtle-text-light); }
+.settings-info-text.error-text { 
+    color: var(--error-color-light);
+    background-color: rgba(var(--error-color-light-rgb), 0.1); 
+    border: 1px solid var(--error-color-light);
+    padding: 8px;
+    border-radius: 4px;
+}
+body.dark-mode .settings-info-text.error-text {
+    color: var(--error-color-dark);
+    background-color: rgba(var(--error-color-dark-rgb), 0.1); 
+    border: 1px solid var(--error-color-dark);
+}
+
+.setting-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; font-size: 0.95em; } 
+.setting-item:not(:last-child) { border-bottom: 1px solid; }
+body.dark-mode .setting-item:not(:last-child) { border-color: var(--divider-color-dark); }
+body.light-mode .setting-item:not(:last-child) { border-color: var(--divider-color-light); }
+.setting-item label:first-child { flex-grow: 1; margin-right: 10px; }
+
+/* Custom Switch Styles */
+.switch { position: relative; display: inline-block; width: 40px; height: 22px; flex-shrink: 0; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; border-radius: 22px; transition: .3s; }
+.slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; border-radius: 50%; transition: .3s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+
+body.dark-mode .slider { background-color: #4A4A4A; } 
+body.dark-mode .slider:before { background-color: #999999; } 
+body.dark-mode input:checked + .slider { background-color: var(--accent-color-dark); }
+body.dark-mode input:focus-visible + .slider { box-shadow: 0 0 0 2px var(--panel-bg-dark), 0 0 0 4px var(--accent-color-dark); }
+body.dark-mode input:checked + .slider:before { transform: translateX(18px); background-color: white; }
+
+body.light-mode .slider { background-color: #ccc; }
+body.light-mode .slider:before { background-color: white; }
+body.light-mode input:checked + .slider { background-color: var(--accent-color-light); }
+body.light-mode input:focus-visible + .slider { box-shadow: 0 0 0 2px var(--panel-bg-light), 0 0 0 4px var(--accent-color-light); }
+body.light-mode input:checked + .slider:before { transform: translateX(18px); background-color: white; }
+
+#modelListContainer { 
+    max-height: 200px; 
+    overflow-y: auto; 
+    padding: 8px; 
+    border-radius: 6px; 
+    margin-bottom: 15px; 
+    border: 1px solid; 
+}
+body.dark-mode #modelListContainer { border-color: var(--input-border-dark); background-color: var(--input-bg-dark); }
+body.light-mode #modelListContainer { border-color: var(--input-border-light); background-color: var(--input-bg-light); }
+#modelListContainer div { display: flex; align-items: center; padding: 6px 8px; border-radius: 4px; }
+body.dark-mode #modelListContainer div:hover { background-color: rgba(255,255,255,0.05); }
+body.light-mode #modelListContainer div:hover { background-color: rgba(0,0,0,0.03); }
+#modelListContainer input[type="checkbox"] { margin-right: 10px; width: 16px; height: 16px; } 
+#modelListContainer label { font-size: 0.9em; cursor: pointer; }
+
+.modal-action-button { 
+    padding: 8px 15px; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    font-size: 0.9em; 
+    min-width: 80px; 
+    border: 1px solid; 
+    transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s; 
+}
+body.dark-mode .modal-action-button { background-color: var(--button-secondary-bg-dark); color: var(--button-secondary-text-dark); border-color: var(--button-secondary-border-dark); }
+body.dark-mode .modal-action-button:hover { background-color: var(--button-secondary-hover-bg-dark); }
+body.dark-mode .modal-action-button.primary, 
+body.dark-mode #saveModelsButton, 
+body.dark-mode .primary-confirm-button { 
+    background-color: var(--button-primary-bg-dark); color: var(--button-primary-text-dark); border-color: var(--button-primary-border-dark); 
+}
+body.dark-mode .modal-action-button.primary:hover,
+body.dark-mode #saveModelsButton:hover,
+body.dark-mode .primary-confirm-button:hover { 
+    background-color: var(--button-primary-hover-bg-dark); 
+}
+
+body.light-mode .modal-action-button { background-color: var(--button-secondary-bg-light); color: var(--button-secondary-text-light); border-color: var(--button-secondary-border-light); }
+body.light-mode .modal-action-button:hover { background-color: var(--button-secondary-hover-bg-light); }
+body.light-mode .modal-action-button.primary,
+body.light-mode #saveModelsButton,
+body.light-mode .primary-confirm-button { 
+    background-color: var(--button-primary-bg-light); color: var(--button-primary-text-light); border-color: var(--button-primary-border-light); 
+}
+body.light-mode .modal-action-button.primary:hover,
+body.light-mode #saveModelsButton:hover,
+body.light-mode .primary-confirm-button:hover { 
+    background-color: var(--button-primary-hover-bg-light); 
+}
+
+
+.modal-footer { 
+    padding: 15px 20px; 
+    text-align: right; 
+    border-top: 1px solid; 
+    flex-shrink: 0; 
+}
+body.dark-mode .modal-footer { border-color: var(--divider-color-dark); }
+body.light-mode .modal-footer { border-color: var(--divider-color-light); }
+#closeSettingsModalFooter { display: none; } 
+
+
+/* Restore Checkpoints Modal Specifics */
+#checkpointsListContainer { max-height: 400px; overflow-y: auto; }
+.checkpoint-list-item {
+    padding: 10px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 1px solid;
+    transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s; 
+}
+.checkpoint-list-item:last-child { margin-bottom: 0; }
+
+body.dark-mode .checkpoint-list-item {
+    background-color: var(--button-secondary-bg-dark);
+    border-color: var(--button-secondary-border-dark);
+    color: var(--button-secondary-text-dark);
+}
+body.dark-mode .checkpoint-list-item:hover,
+body.dark-mode .checkpoint-list-item:focus-visible { 
+    background-color: var(--button-secondary-hover-bg-dark);
+    border-color: var(--accent-color-dark); 
+}
+body.light-mode .checkpoint-list-item {
+    background-color: var(--button-secondary-bg-light);
+    border-color: var(--button-secondary-border-light);
+    color: var(--button-secondary-text-light);
+}
+body.light-mode .checkpoint-list-item:hover,
+body.light-mode .checkpoint-list-item:focus-visible { 
+    background-color: var(--button-secondary-hover-bg-light);
+    border-color: var(--accent-color-light);
+}
+.checkpoint-list-item strong { font-weight: 500; }
+.checkpoint-list-item .timestamp { font-size: 0.85em; opacity: 0.7; display: block; margin-top: 3px; }
+
+
+/* --- AI Context Docs Specific Styles --- */
+#docsSettingsTab .ai-docs-toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+#docsSettingsTab .ai-docs-toolbar .modal-action-button {
+    flex-grow: 1;
+    min-width: 150px; 
+}
+#docsSettingsTab .ai-doc-form {
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px; 
+}
+body.dark-mode #docsSettingsTab .ai-doc-form { background-color: rgba(255,255,255,0.03); border: 1px solid var(--divider-color-dark); }
+body.light-mode #docsSettingsTab .ai-doc-form { background-color: rgba(0,0,0,0.02); border: 1px solid var(--divider-color-light); }
+
+#docsSettingsTab .ai-doc-form h4 { margin-bottom: 5px; font-size: 1.05em; } 
+#docsSettingsTab .ai-doc-form label { font-size: 0.9em; margin-bottom: 5px; display: block; font-weight: 500; }
+#docsSettingsTab .ai-doc-form input[type="text"],
+#docsSettingsTab .ai-doc-form textarea {
+    width: 100%;
+    padding: 10px; 
+    border-radius: 4px;
+    font-size: 0.9em;
+    border: 1px solid;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+body.dark-mode #docsSettingsTab .ai-doc-form input, 
+body.dark-mode #docsSettingsTab .ai-doc-form textarea { background-color: var(--input-bg-dark); color: var(--input-text-dark); border-color: var(--input-border-dark); }
+body.light-mode #docsSettingsTab .ai-doc-form input,
+body.light-mode #docsSettingsTab .ai-doc-form textarea { background-color: var(--input-bg-light); color: var(--input-text-light); border-color: var(--input-border-light); }
+
+
+body.dark-mode #docsSettingsTab .ai-doc-form input:focus, 
+body.dark-mode #docsSettingsTab .ai-doc-form textarea:focus { border-color: var(--input-focus-border-dark); box-shadow: 0 0 0 3px var(--input-focus-shadow-dark); }
+body.light-mode #docsSettingsTab .ai-doc-form input:focus,
+body.light-mode #docsSettingsTab .ai-doc-form textarea:focus { border-color: var(--input-focus-border-light); box-shadow: 0 0 0 3px var(--input-focus-shadow-light); }
+
+#docsSettingsTab .ai-doc-form .textarea-wrapper {
+    position: relative;
+}
+#docsSettingsTab .ai-doc-form .paste-button {
+    position: absolute;
+    top: 8px; 
+    right: 8px; 
+    padding: 4px;
+    background: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+    opacity: 0.7;
+}
+#docsSettingsTab .ai-doc-form .paste-button:hover { opacity: 1; }
+body.dark-mode #docsSettingsTab .ai-doc-form .paste-button { color: var(--icon-color-dark); }
+body.dark-mode #docsSettingsTab .ai-doc-form .paste-button:hover { background-color: var(--header-button-hover-bg-dark); border-color: var(--input-border-dark); }
+body.light-mode #docsSettingsTab .ai-doc-form .paste-button { color: var(--icon-color-light); }
+body.light-mode #docsSettingsTab .ai-doc-form .paste-button:hover { background-color: var(--header-button-hover-bg-light); border-color: var(--input-border-light); }
+#docsSettingsTab .ai-doc-form .paste-button .icon { width: 1em; height: 1em; } 
+
+#docsSettingsTab .ai-doc-form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+#aiDocsListContainer {
+    max-height: 250px; 
+    overflow-y: auto;
+    padding: 5px;
+    border-radius: 4px;
+    border: 1px solid;
+}
+body.dark-mode #aiDocsListContainer { border-color: var(--input-border-dark); }
+body.light-mode #aiDocsListContainer { border-color: var(--input-border-light); }
+
+.ai-doc-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px; 
+    margin-bottom: 6px; 
+    border-radius: 6px; 
+    transition: background-color 0.2s;
+    border: 1px solid transparent;
+}
+body.dark-mode .ai-doc-list-item { background-color: var(--button-secondary-bg-dark); border-color: var(--button-secondary-border-dark);}
+body.dark-mode .ai-doc-list-item:hover { background-color: var(--button-secondary-hover-bg-dark); border-color: var(--input-border-dark); }
+body.light-mode .ai-doc-list-item { background-color: var(--button-secondary-bg-light); border-color: var(--button-secondary-border-light); }
+body.light-mode .ai-doc-list-item:hover { background-color: var(--button-secondary-hover-bg-light); border-color: var(--input-border-light); }
+
+
+.ai-doc-list-item .doc-name {
+    flex-grow: 1;
+    font-size: 0.9em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-right: 10px;
+}
+.ai-doc-list-item .doc-actions { display: flex; align-items: center; gap: 10px; } 
+.ai-doc-list-item .doc-actions .switch { margin-right: 5px; } 
+.ai-doc-list-item .doc-actions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px; 
+    line-height: 1;
+    opacity: 0.8; 
+    transition: opacity 0.2s, color 0.2s, transform 0.1s;
+    border-radius: 4px;
+}
+.ai-doc-list-item .doc-actions button:hover { opacity: 1; transform: scale(1.1); }
+.ai-doc-list-item .doc-actions button .icon { width: 1.1em; height: 1.1em; fill: currentColor; } 
+
+body.dark-mode .ai-doc-list-item .doc-actions button { color: var(--icon-color-dark); }
+body.dark-mode .ai-doc-list-item .doc-actions button:hover { color: var(--text-color-dark); }
+body.dark-mode .ai-doc-list-item .doc-actions .delete-ai-doc-btn:hover { color: var(--error-color-dark); }
+
+body.light-mode .ai-doc-list-item .doc-actions button { color: var(--icon-color-light); }
+body.light-mode .ai-doc-list-item .doc-actions button:hover { color: var(--text-color-light); }
+body.light-mode .ai-doc-list-item .doc-actions .delete-ai-doc-btn:hover { color: var(--error-color-light); }
+
+
+/* AI History Modal */
+.ai-history-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+.ai-history-item {
+    padding: 12px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    border: 1px solid;
+}
+body.dark-mode .ai-history-item { background-color: rgba(255,255,255,0.03); border-color: var(--divider-color-dark); }
+body.light-mode .ai-history-item { background-color: rgba(0,0,0,0.02); border-color: var(--divider-color-light); }
+
+.ai-history-item p { margin: 0 0 8px 0; font-size: 0.9em; }
+.ai-history-item strong { font-weight: 500; }
+.ai-history-item .history-prompt-text {
+    white-space: pre-wrap;
+    word-break: break-word;
+    background-color: rgba(0,0,0,0.1);
+    padding: 8px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.85em;
+    max-height: 100px;
+    overflow-y: auto;
+}
+body.dark-mode .ai-history-item .history-prompt-text { background-color: rgba(255,255,255,0.05); }
+.ai-history-item .history-meta { font-size: 0.8em; opacity: 0.7; }
+.ai-history-item .history-actions { margin-top: 10px; }
+.ai-history-item .history-actions .modal-action-button { font-size: 0.85em; padding: 5px 10px; }
+
+
+/* Subtle Scrollbar Styling */
+#modelListContainer::-webkit-scrollbar,
+#aiDocsListContainer::-webkit-scrollbar,
+.modal-body::-webkit-scrollbar, 
+#aiToolsContent::-webkit-scrollbar,
+#fileExplorer::-webkit-scrollbar,
+.ai-history-list::-webkit-scrollbar,
+.ai-history-item .history-prompt-text::-webkit-scrollbar {
+    width: 8px;
+}
+#modelListContainer::-webkit-scrollbar-track,
+#aiDocsListContainer::-webkit-scrollbar-track,
+.modal-body::-webkit-scrollbar-track,
+#aiToolsContent::-webkit-scrollbar-track,
+#fileExplorer::-webkit-scrollbar-track,
+.ai-history-list::-webkit-scrollbar-track,
+.ai-history-item .history-prompt-text::-webkit-scrollbar-track {
+    background: transparent; 
+}
+body.dark-mode #modelListContainer::-webkit-scrollbar-thumb,
+body.dark-mode #aiDocsListContainer::-webkit-scrollbar-thumb,
+body.dark-mode .modal-body::-webkit-scrollbar-thumb,
+body.dark-mode #aiToolsContent::-webkit-scrollbar-thumb,
+body.dark-mode #fileExplorer::-webkit-scrollbar-thumb,
+body.dark-mode .ai-history-list::-webkit-scrollbar-thumb,
+body.dark-mode .ai-history-item .history-prompt-text::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb-dark);
+    border-radius: 4px;
+    border: 2px solid var(--scrollbar-track-dark); 
+}
+body.light-mode #modelListContainer::-webkit-scrollbar-thumb,
+body.light-mode #aiDocsListContainer::-webkit-scrollbar-thumb,
+body.light-mode .modal-body::-webkit-scrollbar-thumb,
+body.light-mode #aiToolsContent::-webkit-scrollbar-thumb,
+body.light-mode #fileExplorer::-webkit-scrollbar-thumb,
+body.light-mode .ai-history-list::-webkit-scrollbar-thumb,
+body.light-mode .ai-history-item .history-prompt-text::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb-light);
+    border-radius: 4px;
+    border: 2px solid var(--scrollbar-track-light);
+}
+/* For Firefox */
+#modelListContainer, #aiDocsListContainer, .modal-body, #aiToolsContent, #fileExplorer, .ai-history-list, .ai-history-item .history-prompt-text {
+    scrollbar-width: thin;
+}
+body.dark-mode #modelListContainer, 
+body.dark-mode #aiDocsListContainer,
+body.dark-mode .modal-body,
+body.dark-mode #aiToolsContent,
+body.dark-mode #fileExplorer,
+body.dark-mode .ai-history-list,
+body.dark-mode .ai-history-item .history-prompt-text {
+    scrollbar-color: var(--scrollbar-thumb-dark) var(--scrollbar-track-dark);
+}
+body.light-mode #modelListContainer, 
+body.light-mode #aiDocsListContainer,
+body.light-mode .modal-body,
+body.light-mode #aiToolsContent,
+body.light-mode #fileExplorer,
+body.light-mode .ai-history-list,
+body.light-mode .ai-history-item .history-prompt-text {
+    scrollbar-color: var(--scrollbar-thumb-light) var(--scrollbar-track-light);
+}
+
+
+/* --- Welcome Modal specific adjustments --- */
+#welcomeModal .modal-content { max-width: 600px; } /* Adjusted max-width */
+.welcome-modal-header {
+    display: flex;
+    align-items: center;
+    padding-left: 15px !important; /* Override general modal header padding */
+}
+.welcome-logo {
+    width: 32px; /* Adjust size as needed */
+    height: 32px;
+    margin-right: 10px;
+    object-fit: contain;
+}
+#welcomeModalTitle { padding: 15px 0 15px 5px !important; font-size: 1.2em;}
+
+#welcomeModal .modal-body {
+    padding: 15px 20px 20px; /* Adjusted padding */
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Spacing between sections */
+}
+
+.welcome-auth-container {
+    text-align: center;
+    margin-bottom: 10px;
+    min-height: 38px; /* Height of the button to prevent layout shift */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#welcomeLoginButton, #welcomeUsernameDisplay {
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+#welcomeLoginButton.fading-out {
+    opacity: 0;
+    transform: scale(0.9);
+}
+#welcomeUsernameDisplay.fading-in {
+    opacity: 1;
+    transform: scale(1);
+}
+.welcome-username {
+    font-size: 1em;
+    font-weight: 500;
+}
+body.dark-mode .welcome-username { color: var(--text-color-dark); }
+body.light-mode .welcome-username { color: var(--text-color-light); }
+
+
+.welcome-project-name-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+.welcome-project-name-container label {
+    font-size: 0.9em;
+    font-weight: 500;
+}
+body.dark-mode .welcome-project-name-container label { color: var(--subtle-text-dark); }
+body.light-mode .welcome-project-name-container label { color: var(--subtle-text-light); }
+
+#welcomeProjectNameInput {
+    width: 100%;
+    font-size: 0.95em;
+}
+
+.template-selection-title {
+    font-size: 0.95em;
+    font-weight: 500;
+    margin-bottom: 5px;
+    text-align: center;
+}
+body.dark-mode .template-selection-title { color: var(--subtle-text-dark); }
+body.light-mode .template-selection-title { color: var(--subtle-text-light); }
+
+.template-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px; /* Increased gap for better spacing */
+    margin-top: 10px;
+}
+.template-grid-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 15px; /* Increased padding */
+    border-radius: 8px; /* More rounded corners */
+    text-align: center;
+    font-size: 0.9em;
+    height: 120px; /* Fixed height for consistency */
+    border: 1px solid;
+    transition: background-color 0.2s, border-color 0.2s, transform 0.1s;
+}
+.template-grid-button:hover {
+    transform: translateY(-2px);
+}
+body.dark-mode .template-grid-button {
+    background-color: var(--button-secondary-bg-dark);
+    color: var(--button-secondary-text-dark);
+    border-color: var(--button-secondary-border-dark);
+}
+body.dark-mode .template-grid-button:hover,
+body.dark-mode .template-grid-button:focus-visible {
+    background-color: var(--button-secondary-hover-bg-dark);
+    border-color: var(--accent-color-dark);
+}
+body.light-mode .template-grid-button {
+    background-color: var(--button-secondary-bg-light);
+    color: var(--button-secondary-text-light);
+    border-color: var(--button-secondary-border-light);
+}
+body.light-mode .template-grid-button:hover,
+body.light-mode .template-grid-button:focus-visible {
+    background-color: var(--button-secondary-hover-bg-light);
+    border-color: var(--accent-color-light);
+}
+
+.template-grid-button .template-icon {
+    font-size: 2em; /* Larger icon */
+    margin-bottom: 10px;
+}
+.template-grid-button .template-image-icon {
+    width: 32px; /* Adjust as needed */
+    height: 32px;
+    margin-bottom: 10px;
+    object-fit: contain;
+}
+.template-grid-button .template-text {
+    font-weight: 500;
+    line-height: 1.3;
+}
+
+.welcome-modal-footer {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid;
+}
+body.dark-mode .welcome-modal-footer { border-top-color: var(--divider-color-dark); }
+body.light-mode .welcome-modal-footer { border-top-color: var(--divider-color-light); }
+
+.welcome-version-text {
+    font-size: 0.8em;
+    text-align: center;
+    margin-top: 10px;
+}
+body.dark-mode .welcome-version-text { color: var(--subtle-text-dark); }
+body.light-mode .welcome-version-text { color: var(--subtle-text-light); }
+
+
+/* Pop-out Window Specific Styles */
+.popout-edit-element-card {
+    position: fixed;
+    top: 50px;
+    right: 10px;
+    width: 300px;
+    max-height: calc(100vh - 70px);
+    overflow-y: auto;
+    padding: 15px;
+    border-radius: 8px;
+    z-index: 2000;
+    transition: opacity 0.3s, transform 0.3s;
+}
+body.dark-mode .popout-edit-element-card {
+    background-color: var(--panel-bg-dark);
+    border: 1px solid var(--panel-border-dark);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    color: var(--text-color-dark);
+}
+body.light-mode .popout-edit-element-card {
+    background-color: var(--panel-bg-light);
+    border: 1px solid var(--panel-border-light);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    color: var(--text-color-light);
+}
+.popout-edit-element-card.hidden {
+    opacity: 0;
+    transform: translateX(100%);
+    pointer-events: none;
+}
+.popout-edit-element-card h5 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1em;
+}
+/* Use existing #elementEditorControls styles for the content of the popout card, just wrap it */
+.popout-edit-element-card .control-grid input[type="color"] {
+     height: 38px; 
+     padding: 4px;
+}
+
+
+/* --- General & Utility --- */
+a { text-decoration: none; }
+body.dark-mode a { color: var(--link-color-dark); }
+body.dark-mode a:hover, body.dark-mode a:focus-visible { text-decoration: underline; }
+body.light-mode a { color: var(--link-color-light); }
+body.light-mode a:hover, body.light-mode a:focus-visible { text-decoration: underline; }
+
+
+.hidden { display: none !important; }
+
+/* --- Enhanced Focus Styles & Active States --- */
+.preview-icon-button.active-selection,
+.popout-header-button.active-selection {
+    opacity: 1;
+}
+body.dark-mode .preview-icon-button.active-selection,
+body.dark-mode .popout-header-button.active-selection {
+    background-color: var(--accent-color-dark) !important;
+    color: var(--button-primary-text-dark) !important;
+    border-color: var(--accent-color-dark) !important;
+    box-shadow: 0 0 8px rgba(var(--accent-color-rgb-dark), 0.7);
+}
+body.light-mode .preview-icon-button.active-selection,
+body.light-mode .popout-header-button.active-selection {
+    background-color: var(--accent-color-light) !important;
+    color: var(--button-primary-text-light) !important;
+    border-color: var(--accent-color-light) !important;
+    box-shadow: 0 0 8px rgba(var(--accent-color-rgb-light), 0.7);
+}
+
+
+body.dark-mode .header-button:focus-visible,
+body.dark-mode .panel-header-button:focus-visible:not(.file-explorer-toolbar .panel-header-button),
+body.dark-mode .panel-content-toggle:focus-visible,
+body.dark-mode .close-button:focus-visible, 
+body.dark-mode .dropdown-toggle:focus-visible {
+    outline: 2px solid var(--accent-color-dark);
+    outline-offset: 2px; 
+    box-shadow: 0 0 0 3px var(--accent-color-dark); 
+}
+body.light-mode .header-button:focus-visible,
+body.light-mode .panel-header-button:focus-visible:not(.file-explorer-toolbar .panel-header-button),
+body.light-mode .panel-content-toggle:focus-visible,
+body.light-mode .close-button:focus-visible,
+body.light-mode .dropdown-toggle:focus-visible {
+    outline: 2px solid var(--accent-color-light);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px var(--accent-color-light);
+}
+
+
+body.dark-mode #generateCodeButton:focus-visible, 
+body.dark-mode #modifyCodeButton:focus-visible,
+body.dark-mode #applyElementAIEditButton:focus-visible, 
+body.dark-mode #saveManualElementChangesButton:focus-visible, 
+body.dark-mode #selectElementButton:focus-visible, 
+body.dark-mode #editInitialPromptButton:focus-visible,
+body.dark-mode .file-explorer-toolbar .panel-header-button:focus-visible,
+body.dark-mode .modal-action-button:focus-visible,
+body.dark-mode .microphone-button:focus-visible,
+body.dark-mode #codeCheckpointsSection .checkpoint-button:focus-visible,
+body.dark-mode .checkpoint-list-item:focus-visible,
+body.dark-mode .template-grid-button:focus-visible { 
+    border-color: var(--accent-color-dark) !important; 
+    box-shadow: 0 0 0 1px var(--panel-bg-dark), 0 0 0 3px var(--accent-color-dark);
+}
+
+body.light-mode #generateCodeButton:focus-visible, 
+body.light-mode #modifyCodeButton:focus-visible,
+body.light-mode #applyElementAIEditButton:focus-visible, 
+body.light-mode #saveManualElementChangesButton:focus-visible, 
+body.light-mode #selectElementButton:focus-visible, 
+body.light-mode #editInitialPromptButton:focus-visible,
+body.light-mode .file-explorer-toolbar .panel-header-button:focus-visible,
+body.light-mode .modal-action-button:focus-visible,
+body.light-mode .microphone-button:focus-visible,
+body.light-mode #codeCheckpointsSection .checkpoint-button:focus-visible,
+body.light-mode .checkpoint-list-item:focus-visible,
+body.light-mode .template-grid-button:focus-visible {
+    border-color: var(--accent-color-light) !important; 
+    box-shadow: 0 0 0 1px var(--panel-bg-light), 0 0 0 3px var(--accent-color-light);
+}
+
+
+body.dark-mode textarea:focus, 
+body.dark-mode .app-project-name-input:focus, 
+body.dark-mode .control-grid input:focus, 
+body.dark-mode .control-grid select:focus,
+body.dark-mode #elementEditorControls textarea:focus,
+body.dark-mode select#modelSelect:focus,
+body.dark-mode #newFileFolderInputContainer input[type="text"]:focus {
+    border-color: var(--input-focus-border-dark) !important; 
+    box-shadow: 0 0 0 3px var(--input-focus-shadow-dark); 
+    background-color: var(--input-bg-dark); 
+}
+body.light-mode textarea:focus, 
+body.light-mode .app-project-name-input:focus,
+body.light-mode .control-grid input:focus, 
+body.light-mode .control-grid select:focus,
+body.light-mode #elementEditorControls textarea:focus,
+body.light-mode select#modelSelect:focus,
+body.light-mode #newFileFolderInputContainer input[type="text"]:focus {
+    border-color: var(--input-focus-border-light) !important; 
+    box-shadow: 0 0 0 3px var(--input-focus-shadow-light); 
+    background-color: var(--input-bg-light); 
+}
+
+
+body.dark-mode .file-tree-list li:focus-visible:not(.active-file),
+body.dark-mode .tab-button:focus-visible:not(.active) {
+    outline: 2px solid var(--accent-color-dark);
+    outline-offset: -2px; 
+    background-color: var(--header-button-hover-bg-dark); 
+    color: var(--text-color-dark); 
+}
+body.light-mode .file-tree-list li:focus-visible:not(.active-file),
+body.light-mode .tab-button:focus-visible:not(.active) {
+    outline: 2px solid var(--accent-color-light);
+    outline-offset: -2px;
+    background-color: var(--header-button-hover-bg-light);
+    color: var(--text-color-light);
+}
+
+
+body.dark-mode .file-tree-list li.active-file:focus-visible,
+body.dark-mode .tab-button.active:focus-visible {
+    outline: 2px solid var(--accent-color-dark); 
+    outline-offset: 1px; 
+    
+}
+body.light-mode .file-tree-list li.active-file:focus-visible,
+body.light-mode .tab-button.active:focus-visible {
+    outline: 2px solid var(--accent-color-light);
+    outline-offset: 1px;
+}
+
+
+/* --- Responsive Design --- */
+@media (max-width: 768px) {
+    header, .secondary-header { 
+        flex-direction: column; 
+        align-items: stretch; 
+        gap: 8px; 
+        padding: 10px; 
+    }
+    .header-left, .header-center, .header-right,
+    .secondary-header-left, .secondary-header-center, .secondary-header-right {
+        width: 100%;
+        justify-content: flex-start; 
+        margin-top: 5px; 
+    }
+    .header-center { justify-content: flex-start; } 
+    .secondary-header-center { justify-content: flex-start; min-width: auto; } 
+
+    .header-right, .secondary-header-right { 
+        flex-wrap: wrap; 
+        gap: 5px; 
+        justify-content: flex-start; 
+    }
+    .header-right .header-button, 
+    .secondary-header-right .header-button { 
+        padding: 5px 8px; 
+        font-size: 0.8em; 
+        flex-grow: 1; 
+        min-width: 100px; 
+    }
+    .app-project-name-input { width: 100%; max-width: none; }
+
+    main#mainContainer { flex-direction: column; }
+    .panel-resizer { display: none;  }
+
+    #aiToolsPanel { 
+        flex: 0 0 auto; 
+        min-height: auto; /* Allow header only if content minimized */
+        max-height: 50vh; 
+        border-right: none; 
+        flex-basis: auto !important; 
+    }
+    #codeEditorPanel, #previewPanel { 
+        flex: 1 1 50%; 
+        min-height: auto; /* Allow header only if content minimized */
+        border-right: none; 
+        border-top: 1px solid; 
+        flex-basis: auto !important; 
+    }
+    body.dark-mode #codeEditorPanel, body.dark-mode #previewPanel { border-top-color: var(--divider-color-dark); }
+    body.light-mode #codeEditorPanel, body.light-mode #previewPanel { border-top-color: var(--divider-color-light); }
+    
+    .panel-header div { 
+        display: flex; 
+        flex-wrap: wrap; 
+        gap: 5px; 
+        justify-content: flex-end; 
+    }
+    #fileExplorer { max-height: 200px;  }
+
+    .modal-content {
+        width: 95%; 
+        max-height: 95vh; 
+    }
+    .modal-header { flex-wrap: wrap; padding-right: 15px; } 
+    .modal-header h2 { margin-right: 10px; }
+    .modal-header .tabs { width: 100%; order: 1; margin-left: 0; margin-top: 10px; justify-content: center; } 
+    .modal-header .close-button { order: 0; } 
+
+    #elementEditorControls .control-grid.two-columns,
+    #elementEditorControls .control-grid.three-columns { 
+        grid-template-columns: 1fr; 
+    }
+
+
+    #docsSettingsTab .ai-docs-toolbar {
+        flex-direction: column; 
+    }
+    #docsSettingsTab .ai-docs-toolbar .modal-action-button {
+        width: 100%; 
+    }
+    #docsSettingsTab .ai-doc-form-actions {
+        flex-direction: column; 
+    }
+     #docsSettingsTab .ai-doc-form-actions .modal-action-button {
+        width: 100%; 
+    }
+
+    #welcomeModal .modal-content { max-width: 95%; }
+    .template-grid { grid-template-columns: 1fr; } /* Stack template buttons on small screens */
+    .template-grid-button { height: auto; min-height: 100px; }
+}
