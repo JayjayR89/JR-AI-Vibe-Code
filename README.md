@@ -1,6 +1,6 @@
 # Run and deploy your AI Studio app
 
-https://jayjayr89.github.io/JR-Vibe-Code/
+https://jayjayr89.github.io/JR-AI-Vibe-Code/
 
 This contains everything you need to run your app locally.
 
