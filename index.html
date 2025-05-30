@@ -251,16 +251,32 @@
 
             <div id="modelSettingsTab" class="tab-content">
                 <h3>API & Model Selection</h3>
-                 <div class="setting-item">
-                    <label for="geminiApiToggle">Enable Gemini API</label>
-                    <label class="switch">
-                        <input type="checkbox" id="geminiApiToggle">
-                        <span class="slider round"></span>
-                    </label>
+                 <!-- Gemini API Section -->
+                <div class="setting-group">
+                    <h4>Gemini API Configuration</h4>
+                    <div class="setting-item">
+                        <label for="geminiApiKey">Gemini API Key</label>
+                        <div class="api-key-input-group">
+                            <input type="password" id="geminiApiKey" placeholder="Enter your Gemini API key">
+                            <button id="testGeminiKey" class="modal-action-button">Test Key</button>
+                            <button id="saveGeminiKey" class="modal-action-button primary-confirm-button">Save Key</button>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <label for="geminiApiToggle">Enable Gemini API</label>
+                        <label class="switch">
+                            <input type="checkbox" id="geminiApiToggle" disabled>
+                            <span class="slider round"></span>
+                        </label>
+                        <p class="setting-description">Save a valid API key first to enable Gemini API</p>
+                    </div>
                 </div>
-                <p style="margin-top: 15px;">Select Puter.com models (active if Gemini API is disabled):</p>
-                <div id="modelListContainer" role="listbox" aria-multiselectable="true"></div>
-                <!-- Save Models Button moved to modal-footer -->
+                <!-- Puter.com Models Section -->
+                <div class="setting-group">
+                    <h4>Puter.com Models</h4>
+                    <p>Select models (active if Gemini API is disabled):</p>
+                    <div id="modelListContainer" role="listbox" aria-multiselectable="true"></div>
+                </div>
             </div>
 
             <div id="generalSettingsTab" class="tab-content">
