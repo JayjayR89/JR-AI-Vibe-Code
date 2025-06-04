@@ -1,5 +1,5 @@
 // Import Google Gemini API
-import GoogleGenerativeAI from '@google/genai';
+import { GoogleGenerativeAI } from '@google/genai';
 
 // Constants
 const SETTINGS_STORAGE_KEY = 'vibeCodeSettings';
