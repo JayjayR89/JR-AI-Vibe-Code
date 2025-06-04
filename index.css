@@ -5,22 +5,25 @@
     box-sizing: border-box;
 }
 
-/* Root Variables */
+html, body {
+    height: 100%;
+}
+
 :root {
-    --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     
-    /* Dark Theme Variables */
-    --bg-color-dark: #1A1A1A;
-    --text-color-dark: #E5E5E5;
-    --panel-bg-dark: #242424;
+    /* Dark Theme Variables - Updated "Dark Grey" Palette */
+    --bg-color-dark: #1A1A1A; /* Dark grey background */
+    --text-color-dark: #E5E5E5; /* Very light grey text */
+    --panel-bg-dark: #242424; /* Dark grey for panels */
     --panel-border-dark: #333333;
-    --header-bg-dark: #202020;
+    --header-bg-dark: #202020; /* Slightly different dark grey for header */
     --header-border-dark: #2D2D2D;
     --header-button-bg-dark: transparent;
     --header-button-hover-bg-dark: rgba(220, 220, 220, 0.1);
-    --header-button-text-dark: #CCCCCC;
+    --header-button-text-dark: #CCCCCC; /* Lighter text for header buttons */
     --header-button-border-dark: #404040;
-    --button-primary-bg-dark: #238636;
+    --button-primary-bg-dark: #238636; /* Green for primary actions */
     --button-primary-hover-bg-dark: #2EA043;
     --button-primary-text-dark: #FFFFFF;
     --button-primary-border-dark: #238636;
@@ -28,13 +31,13 @@
     --button-secondary-hover-bg-dark: #4A4A4A;
     --button-secondary-text-dark: #E0E0E0;
     --button-secondary-border-dark: #505050;
-    --input-bg-dark: #1E1E1E;
+    --input-bg-dark: #1E1E1E; /* Darker grey for inputs */
     --input-border-dark: #3C3C3C;
     --input-text-dark: #E0E0E0;
-    --input-focus-border-dark: var(--accent-color-dark);
+    --input-focus-border-dark: var(--accent-color-dark); /* Use accent for focus */
     --input-focus-shadow-dark: rgba(var(--accent-color-rgb-dark), 0.4);
     --placeholder-text-dark: #888888;
-    --accent-color-dark: #58A6FF;
+    --accent-color-dark: #58A6FF; /* Blue accent, good contrast on grey */
     --accent-color-rgb-dark: 88, 166, 255;
     --icon-color-dark: #AAAAAA;
     --link-color-dark: var(--accent-color-dark);
@@ -44,6 +47,11 @@
     --divider-color-dark: var(--panel-border-dark);
     --error-color-dark: #f85149;
     --error-color-dark-rgb: 248, 81, 73;
+    --scrollbar-thumb-dark: #555;
+    --scrollbar-track-dark: #333;
+    --panel-resizer-bg-dark: #383838;
+    --panel-resizer-hover-bg-dark: var(--accent-color-dark);
+
 
     /* Light Theme Variables */
     --bg-color-light: #f0f2f5;
@@ -67,7 +75,7 @@
     --input-bg-light: #ffffff;
     --input-border-light: #d0d7de;
     --input-text-light: #24292f;
-    --input-focus-border-light: var(--accent-color-light);
+    --input-focus-border-light: var(--accent-color-light); /* Use accent for focus */
     --input-focus-shadow-light: rgba(var(--accent-color-rgb-light), 0.4);
     --placeholder-text-light: #6e7681;
     --accent-color-light: #0969da;
@@ -80,14 +88,17 @@
     --divider-color-light: #d0d7de;
     --error-color-light: #d73a49;
     --error-color-light-rgb: 215, 58, 73;
+    --scrollbar-thumb-light: #aaa;
+    --scrollbar-track-light: #eee;
+    --panel-resizer-bg-light: #e0e0e0;
+    --panel-resizer-hover-bg-light: var(--accent-color-light);
 }
 
-/* Base Styles */
 body {
     font-family: var(--font-family);
     margin: 0;
-    background-color: var(--bg-color-dark);
-    color: var(--text-color-dark);
+    background-color: rgba(30, 30, 30, 0.85);
+    color: #e0e0e0;
     display: flex;
     flex-direction: column;
     height: 100vh;
@@ -97,276 +108,6 @@ body {
 
 body.dark-mode { background-color: var(--bg-color-dark); color: var(--text-color-dark); }
 body.light-mode { background-color: var(--bg-color-light); color: var(--text-color-light); }
-
-/* Gemini API Settings Styles */
-.setting-group {
-    margin-bottom: 25px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid;
-}
-
-body.dark-mode .setting-group {
-    border-color: var(--divider-color-dark);
-}
-
-body.light-mode .setting-group {
-    border-color: var(--divider-color-light);
-}
-
-.setting-group h4 {
-    margin: 0 0 15px;
-    font-size: 1em;
-    font-weight: 500;
-}
-
-body.dark-mode .setting-group h4 {
-    color: var(--text-color-dark);
-}
-
-body.light-mode .setting-group h4 {
-    color: var(--text-color-light);
-}
-
-.api-key-input-group {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    margin-top: 8px;
-    width: 100%;
-}
-
-.api-key-input-group input[type="password"] {
-    flex: 1;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 0.9em;
-    border: 1px solid;
-    transition: all 0.2s ease;
-}
-
-body.dark-mode .api-key-input-group input[type="password"] {
-    background-color: var(--input-bg-dark);
-    color: var(--input-text-dark);
-    border-color: var(--input-border-dark);
-}
-
-body.light-mode .api-key-input-group input[type="password"] {
-    background-color: var(--input-bg-light);
-    color: var(--input-text-light);
-    border-color: var(--input-border-light);
-}
-
-.api-key-input-group input[type="password"]:focus {
-    outline: none;
-}
-
-body.dark-mode .api-key-input-group input[type="password"]:focus {
-    border-color: var(--accent-color-dark);
-    box-shadow: 0 0 0 2px var(--input-focus-shadow-dark);
-}
-
-body.light-mode .api-key-input-group input[type="password"]:focus {
-    border-color: var(--accent-color-light);
-    box-shadow: 0 0 0 2px var(--input-focus-shadow-light);
-}
-
-.api-key-input-group button {
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 0.9em;
-    border: 1px solid;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-}
-
-body.dark-mode .api-key-input-group button {
-    background-color: var(--button-secondary-bg-dark);
-    color: var(--button-secondary-text-dark);
-    border-color: var(--button-secondary-border-dark);
-}
-
-body.light-mode .api-key-input-group button {
-    background-color: var(--button-secondary-bg-light);
-    color: var(--button-secondary-text-light);
-    border-color: var(--button-secondary-border-light);
-}
-
-.api-key-input-group button.primary-confirm-button {
-    background-color: var(--button-primary-bg-dark);
-    color: var(--button-primary-text-dark);
-    border-color: var(--button-primary-border-dark);
-}
-
-body.light-mode .api-key-input-group button.primary-confirm-button {
-    background-color: var(--button-primary-bg-light);
-    color: var(--button-primary-text-light);
-    border-color: var(--button-primary-border-light);
-}
-
-.api-key-input-group button:hover {
-    opacity: 0.9;
-}
-
-.api-key-input-group button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-/* Loading State for Buttons */
-.api-key-input-group button.loading {
-    position: relative;
-    color: transparent !important;
-    pointer-events: none;
-}
-
-.api-key-input-group button.loading::after {
-    content: "";
-    position: absolute;
-    width: 16px;
-    height: 16px;
-    top: 50%;
-    left: 50%;
-    margin: -8px 0 0 -8px;
-    border: 2px solid transparent;
-    border-top-color: currentColor;
-    border-radius: 50%;
-    animation: button-loading-spinner 0.6s linear infinite;
-}
-
-@keyframes button-loading-spinner {
-    from {
-        transform: rotate(0turn);
-    }
-    to {
-        transform: rotate(1turn);
-    }
-}
-
-.setting-description {
-    font-size: 0.85em;
-    margin-top: 5px;
-    opacity: 0.8;
-}
-
-body.dark-mode .setting-description {
-    color: var(--subtle-text-dark);
-}
-
-body.light-mode .setting-description {
-    color: var(--subtle-text-light);
-}
-
-/* Switch Toggle Styles */
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 40px;
-    height: 20px;
-}
-
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: var(--button-secondary-bg-dark);
-    transition: .4s;
-    border-radius: 20px;
-}
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 16px;
-    width: 16px;
-    left: 2px;
-    bottom: 2px;
-    background-color: white;
-    transition: .4s;
-    border-radius: 50%;
-}
-
-input:checked + .slider {
-    background-color: var(--accent-color-dark);
-}
-
-input:focus + .slider {
-    box-shadow: 0 0 1px var(--accent-color-dark);
-}
-
-input:checked + .slider:before {
-    transform: translateX(20px);
-}
-
-/* Disabled state for toggle */
-input:disabled + .slider {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-body.light-mode .slider {
-    background-color: var(--button-secondary-bg-light);
-}
-
-body.light-mode input:checked + .slider {
-    background-color: var(--accent-color-light);
-}
-
-body.light-mode input:focus + .slider {
-    box-shadow: 0 0 1px var(--accent-color-light);
-}
-
-/* Setting Item Layout */
-.setting-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 15px;
-    padding: 5px 0;
-}
-
-.setting-item label:first-child {
-    margin-right: 15px;
-}
-
-/* Model List Container */
-#modelListContainer {
-    margin-top: 10px;
-    border: 1px solid;
-    border-radius: 6px;
-    padding: 10px;
-    max-height: 200px;
-    overflow-y: auto;
-}
-
-body.dark-mode #modelListContainer {
-    border-color: var(--input-border-dark);
-    background-color: var(--input-bg-dark);
-}
-
-body.light-mode #modelListContainer {
-    border-color: var(--input-border-light);
-    background-color: var(--input-bg-light);
-}
-
-#modelListContainer div {
-    display: flex;
-    align-items: center;
-    padding: 5px 0;
-}
-
-#modelListContainer input[type="checkbox"] {
-    margin-right: 10px;
-}
 
 /* --- Headers --- */
 header,
@@ -2089,117 +1830,4 @@ body.light-mode .tab-button.active:focus-visible {
     #welcomeModal .modal-content { max-width: 95%; }
     .template-grid { grid-template-columns: 1fr; } /* Stack template buttons on small screens */
     .template-grid-button { height: auto; min-height: 100px; }
-}
-
-/* Add these new styles to your existing index.css file */
-
-/* Gemini API Key Input Group */
-.api-key-input-group {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    margin-top: 5px;
-}
-
-.api-key-input-group input[type="password"] {
-    flex: 1;
-    padding: 8px;
-    border-radius: 4px;
-    font-size: 0.9em;
-    border: 1px solid;
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-body.dark-mode .api-key-input-group input[type="password"] {
-    background-color: var(--input-bg-dark);
-    color: var(--input-text-dark);
-    border-color: var(--input-border-dark);
-}
-
-body.dark-mode .api-key-input-group input[type="password"]:focus {
-    border-color: var(--input-focus-border-dark);
-    box-shadow: 0 0 0 2px var(--input-focus-shadow-dark);
-}
-
-body.light-mode .api-key-input-group input[type="password"] {
-    background-color: var(--input-bg-light);
-    color: var(--input-text-light);
-    border-color: var(--input-border-light);
-}
-
-body.light-mode .api-key-input-group input[type="password"]:focus {
-    border-color: var(--input-focus-border-light);
-    box-shadow: 0 0 0 2px var(--input-focus-shadow-light);
-}
-
-.setting-group {
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid;
-}
-
-body.dark-mode .setting-group {
-    border-color: var(--divider-color-dark);
-}
-
-body.light-mode .setting-group {
-    border-color: var(--divider-color-light);
-}
-
-.setting-group h4 {
-    margin: 0 0 10px;
-    font-size: 1em;
-    font-weight: 500;
-    color: var(--text-color-dark);
-}
-
-body.light-mode .setting-group h4 {
-    color: var(--text-color-light);
-}
-
-.api-key-input-group button {
-    white-space: nowrap;
-    padding: 8px 12px;
-    border-radius: 4px;
-    font-size: 0.9em;
-    border: 1px solid;
-    cursor: pointer;
-    transition: background-color 0.2s, border-color 0.2s;
-}
-
-.api-key-input-group button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-body.dark-mode .api-key-input-group button {
-    background-color: var(--button-secondary-bg-dark);
-    color: var(--button-secondary-text-dark);
-    border-color: var(--button-secondary-border-dark);
-}
-
-body.dark-mode .api-key-input-group button:hover:not(:disabled) {
-    background-color: var(--button-secondary-hover-bg-dark);
-}
-
-body.light-mode .api-key-input-group button {
-    background-color: var(--button-secondary-bg-light);
-    color: var(--button-secondary-text-light);
-    border-color: var(--button-secondary-border-light);
-}
-
-body.light-mode .api-key-input-group button:hover:not(:disabled) {
-    background-color: var(--button-secondary-hover-bg-light);
-}
-
-.api-key-input-group button.primary-confirm-button {
-    background-color: var(--button-primary-bg-dark);
-    color: var(--button-primary-text-dark);
-    border-color: var(--button-primary-border-dark);
-}
-
-body.light-mode .api-key-input-group button.primary-confirm-button {
-    background-color: var(--button-primary-bg-light);
-    color: var(--button-primary-text-light);
-    border-color: var(--button-primary-border-light);
 }
